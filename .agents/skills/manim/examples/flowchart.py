@@ -10,9 +10,13 @@ from manim import *
 def make_node(label, color=BLUE, width=2, height=1):
     """Create a labeled flowchart node."""
     rect = RoundedRectangle(
-        width=width, height=height, corner_radius=0.15,
-        fill_color=color, fill_opacity=0.3,
-        stroke_color=color, stroke_width=2
+        width=width,
+        height=height,
+        corner_radius=0.15,
+        fill_color=color,
+        fill_opacity=0.3,
+        stroke_color=color,
+        stroke_width=2,
     )
     text = Text(label, font_size=20)
     text.move_to(rect)
@@ -43,12 +47,10 @@ class SimpleFlow(Scene):
 
         # Create arrows
         arrow1 = Arrow(
-            input_node.get_right(), process_node.get_left(),
-            buff=0.1, color=GRAY
+            input_node.get_right(), process_node.get_left(), buff=0.1, color=GRAY
         )
         arrow2 = Arrow(
-            process_node.get_right(), output_node.get_left(),
-            buff=0.1, color=GRAY
+            process_node.get_right(), output_node.get_left(), buff=0.1, color=GRAY
         )
 
         # Animate construction
@@ -76,30 +78,40 @@ class BranchingFlow(Scene):
         end_node = make_node("Response", PURPLE).shift(RIGHT * 5)
 
         # Arrows
-        start_arrow = Arrow(start.get_right(), decision.get_left(), buff=0.1, color=GRAY)
+        start_arrow = Arrow(
+            start.get_right(), decision.get_left(), buff=0.1, color=GRAY
+        )
 
         yes_arrow = Arrow(
-            decision.get_corner(UR), yes_node.get_left(),
-            buff=0.1, color=GREEN
+            decision.get_corner(UR), yes_node.get_left(), buff=0.1, color=GREEN
         )
         no_arrow = Arrow(
-            decision.get_corner(DR), no_node.get_left(),
-            buff=0.1, color=RED
+            decision.get_corner(DR), no_node.get_left(), buff=0.1, color=RED
         )
 
-        yes_to_end = Arrow(yes_node.get_right(), end_node.get_left() + UP * 0.3, buff=0.1, color=GRAY)
-        no_to_end = Arrow(no_node.get_right(), end_node.get_left() + DOWN * 0.3, buff=0.1, color=GRAY)
+        yes_to_end = Arrow(
+            yes_node.get_right(), end_node.get_left() + UP * 0.3, buff=0.1, color=GRAY
+        )
+        no_to_end = Arrow(
+            no_node.get_right(), end_node.get_left() + DOWN * 0.3, buff=0.1, color=GRAY
+        )
 
         # Labels
-        yes_label = Text("Yes", font_size=14, color=GREEN).next_to(yes_arrow, UL, buff=0.05)
+        yes_label = Text("Yes", font_size=14, color=GREEN).next_to(
+            yes_arrow, UL, buff=0.05
+        )
         no_label = Text("No", font_size=14, color=RED).next_to(no_arrow, DL, buff=0.05)
 
         # Animate
         self.play(GrowFromCenter(start))
         self.play(GrowArrow(start_arrow), GrowFromCenter(decision))
         self.play(
-            GrowArrow(yes_arrow), FadeIn(yes_label), GrowFromCenter(yes_node),
-            GrowArrow(no_arrow), FadeIn(no_label), GrowFromCenter(no_node)
+            GrowArrow(yes_arrow),
+            FadeIn(yes_label),
+            GrowFromCenter(yes_node),
+            GrowArrow(no_arrow),
+            FadeIn(no_label),
+            GrowFromCenter(no_node),
         )
         self.play(GrowArrow(yes_to_end), GrowArrow(no_to_end), GrowFromCenter(end_node))
         self.wait(1)
@@ -123,9 +135,7 @@ class VerticalFlow(Scene):
         arrows = VGroup()
         for i in range(len(nodes) - 1):
             arr = Arrow(
-                nodes[i].get_bottom(),
-                nodes[i + 1].get_top(),
-                buff=0.1, color=GRAY
+                nodes[i].get_bottom(), nodes[i + 1].get_top(), buff=0.1, color=GRAY
             )
             arrows.add(arr)
 
@@ -151,16 +161,12 @@ class ProcessHighlight(Scene):
         arrows = VGroup()
         for i in range(len(nodes) - 1):
             arr = Arrow(
-                nodes[i].get_right(), nodes[i + 1].get_left(),
-                buff=0.1, color=GRAY
+                nodes[i].get_right(), nodes[i + 1].get_left(), buff=0.1, color=GRAY
             )
             arrows.add(arr)
 
         # Show all
-        self.play(
-            *[FadeIn(n) for n in nodes],
-            *[GrowArrow(a) for a in arrows]
-        )
+        self.play(*[FadeIn(n) for n in nodes], *[GrowArrow(a) for a in arrows])
         self.wait(0.5)
 
         # Animate progress through each step
@@ -169,7 +175,7 @@ class ProcessHighlight(Scene):
             self.play(
                 node[0].animate.set_fill(GREEN, opacity=0.5),
                 node[0].animate.set_stroke(GREEN),
-                run_time=0.4
+                run_time=0.4,
             )
             self.wait(0.3)
 
@@ -178,7 +184,7 @@ class ProcessHighlight(Scene):
                 self.play(
                     node[0].animate.set_fill(GRAY, opacity=0.2),
                     node[0].animate.set_stroke(GRAY),
-                    run_time=0.2
+                    run_time=0.2,
                 )
 
         self.wait(1)

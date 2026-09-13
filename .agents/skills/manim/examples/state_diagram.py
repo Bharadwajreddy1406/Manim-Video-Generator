@@ -77,9 +77,11 @@ class StateWithLabels(Scene):
         finish_label = Text("done", font_size=14).next_to(finish_arrow, UP, buff=0.05)
 
         # Self-loop for retry
-        retry_arc = Arc(radius=0.4, start_angle=PI/4, angle=3*PI/2, color=ORANGE)
+        retry_arc = Arc(radius=0.4, start_angle=PI / 4, angle=3 * PI / 2, color=ORANGE)
         retry_arc.next_to(loading, UP, buff=0.1)
-        retry_label = Text("retry", font_size=12, color=ORANGE).next_to(retry_arc, UP, buff=0.05)
+        retry_label = Text("retry", font_size=12, color=ORANGE).next_to(
+            retry_arc, UP, buff=0.05
+        )
 
         # Build
         self.play(FadeIn(idle))
@@ -103,14 +105,18 @@ class LinkedListMismatch(Scene):
         r1_states = VGroup(
             make_indexed_state("name", 0, GREEN),
             make_indexed_state("age", 1, GREEN),
-            make_indexed_state("effect", 2, PURPLE)
+            make_indexed_state("effect", 2, PURPLE),
         ).arrange(RIGHT, buff=1)
         r1_states.next_to(r1_label, DOWN, buff=0.5).shift(RIGHT * 2)
 
         # Arrows in list
         r1_arrows = VGroup(
-            Arrow(r1_states[0].get_right(), r1_states[1].get_left(), buff=0.1, color=GRAY),
-            Arrow(r1_states[1].get_right(), r1_states[2].get_left(), buff=0.1, color=GRAY)
+            Arrow(
+                r1_states[0].get_right(), r1_states[1].get_left(), buff=0.1, color=GRAY
+            ),
+            Arrow(
+                r1_states[1].get_right(), r1_states[2].get_left(), buff=0.1, color=GRAY
+            ),
         )
 
         self.play(FadeIn(r1_label))
@@ -124,11 +130,13 @@ class LinkedListMismatch(Scene):
 
         r2_states = VGroup(
             make_indexed_state("age", 0, ORANGE),
-            make_indexed_state("effect", 1, ORANGE)
+            make_indexed_state("effect", 1, ORANGE),
         ).arrange(RIGHT, buff=1)
         r2_states.next_to(r2_label, DOWN, buff=0.5).shift(RIGHT * 2)
 
-        r2_arrow = Arrow(r2_states[0].get_right(), r2_states[1].get_left(), buff=0.1, color=GRAY)
+        r2_arrow = Arrow(
+            r2_states[0].get_right(), r2_states[1].get_left(), buff=0.1, color=GRAY
+        )
 
         self.play(FadeIn(r2_label))
         self.play(*[GrowFromCenter(s) for s in r2_states])
@@ -136,18 +144,26 @@ class LinkedListMismatch(Scene):
 
         # Wrong matching lines
         wrong_match_1 = DashedLine(
-            r1_states[0].get_bottom(), r2_states[0].get_top(),
-            color=RED, dash_length=0.1
+            r1_states[0].get_bottom(),
+            r2_states[0].get_top(),
+            color=RED,
+            dash_length=0.1,
         )
         wrong_match_2 = DashedLine(
-            r1_states[1].get_bottom(), r2_states[1].get_top(),
-            color=RED, dash_length=0.1
+            r1_states[1].get_bottom(),
+            r2_states[1].get_top(),
+            color=RED,
+            dash_length=0.1,
         )
 
         x1 = Text("✗", font_size=24, color=RED)
-        x1.move_to((r1_states[0].get_center() + r2_states[0].get_center()) / 2 + RIGHT * 0.5)
+        x1.move_to(
+            (r1_states[0].get_center() + r2_states[0].get_center()) / 2 + RIGHT * 0.5
+        )
         x2 = Text("✗", font_size=24, color=RED)
-        x2.move_to((r1_states[1].get_center() + r2_states[1].get_center()) / 2 + RIGHT * 0.5)
+        x2.move_to(
+            (r1_states[1].get_center() + r2_states[1].get_center()) / 2 + RIGHT * 0.5
+        )
 
         err1 = Text("name→age", font_size=12, color=RED).next_to(x1, RIGHT, buff=0.1)
         err2 = Text("age→effect", font_size=12, color=RED).next_to(x2, RIGHT, buff=0.1)
@@ -159,7 +175,9 @@ class LinkedListMismatch(Scene):
         # Lost state
         lost = Text("effect lost!", font_size=16, color=RED)
         lost.next_to(r1_states[2], DOWN, buff=1.2)
-        lost_arrow = Arrow(r1_states[2].get_bottom(), lost.get_top(), buff=0.1, color=RED)
+        lost_arrow = Arrow(
+            r1_states[2].get_bottom(), lost.get_top(), buff=0.1, color=RED
+        )
 
         self.play(GrowArrow(lost_arrow), FadeIn(lost))
         self.wait(1.5)
@@ -175,9 +193,15 @@ class CyclicStates(Scene):
         state_c = make_state("Stop", PURPLE).shift(DOWN * 0.5 + RIGHT * 2)
 
         # Curved arrows for cycle
-        ab_arrow = CurvedArrow(state_a.get_bottom() + LEFT * 0.3, state_b.get_top(), angle=-0.3)
+        ab_arrow = CurvedArrow(
+            state_a.get_bottom() + LEFT * 0.3, state_b.get_top(), angle=-0.3
+        )
         bc_arrow = CurvedArrow(state_b.get_right(), state_c.get_left(), angle=-0.3)
-        ca_arrow = CurvedArrow(state_c.get_top() + RIGHT * 0.3, state_a.get_bottom() + RIGHT * 0.3, angle=-0.5)
+        ca_arrow = CurvedArrow(
+            state_c.get_top() + RIGHT * 0.3,
+            state_a.get_bottom() + RIGHT * 0.3,
+            angle=-0.5,
+        )
 
         # Labels
         ab_label = Text("start", font_size=12).next_to(ab_arrow, LEFT, buff=0.05)
@@ -187,9 +211,12 @@ class CyclicStates(Scene):
         # Build
         self.play(FadeIn(state_a), FadeIn(state_b), FadeIn(state_c))
         self.play(
-            Create(ab_arrow), FadeIn(ab_label),
-            Create(bc_arrow), FadeIn(bc_label),
-            Create(ca_arrow), FadeIn(ca_label)
+            Create(ab_arrow),
+            FadeIn(ab_label),
+            Create(bc_arrow),
+            FadeIn(bc_label),
+            Create(ca_arrow),
+            FadeIn(ca_label),
         )
 
         # Animate cycle

@@ -44,15 +44,23 @@ class QuickSortBars(Scene):
 
         self.add(*self.build_background())
 
-        title = Text("Quick Sort", font_size=56, weight=BOLD, color=WHITE).to_edge(UP, buff=0.2)
+        title = Text("Quick Sort", font_size=56, weight=BOLD, color=WHITE).to_edge(
+            UP, buff=0.2
+        )
         subtitle = Text(
             "Lomuto Partition | AI-ready Showcase",
             font_size=24,
             color=GRAY_A,
         ).next_to(title, DOWN, buff=0.08)
-        self.play(FadeIn(title, shift=0.15 * DOWN), FadeIn(subtitle, shift=0.15 * DOWN), run_time=1.0)
+        self.play(
+            FadeIn(title, shift=0.15 * DOWN),
+            FadeIn(subtitle, shift=0.15 * DOWN),
+            run_time=1.0,
+        )
 
-        bars, value_labels, index_labels = self.build_bars(events[0], len(data), max_value)
+        bars, value_labels, index_labels = self.build_bars(
+            events[0], len(data), max_value
+        )
         baseline = Line(
             np.array([-6.4, self.BASELINE_Y, 0]),
             np.array([6.4, self.BASELINE_Y, 0]),
@@ -60,7 +68,9 @@ class QuickSortBars(Scene):
             stroke_width=2,
         )
 
-        message = Text(events[0].message, font_size=self.MESSAGE_FONT_SIZE, color=GRAY_A).to_edge(DOWN, buff=0.38)
+        message = Text(
+            events[0].message, font_size=self.MESSAGE_FONT_SIZE, color=GRAY_A
+        ).to_edge(DOWN, buff=0.38)
 
         legend = self.build_legend()
         legend.to_corner(UR, buff=0.28)
@@ -69,8 +79,11 @@ class QuickSortBars(Scene):
         stats_panel.set_stroke(color=GRAY_C, width=1.5, opacity=0.8)
         stats_panel.set_fill(color="#101827", opacity=0.84)
         stats_panel.to_corner(UL, buff=0.28)
-        stats_text = self.build_stats_text(events[0]).move_to(stats_panel.get_center()).align_to(stats_panel, LEFT).shift(
-            RIGHT * 0.2
+        stats_text = (
+            self.build_stats_text(events[0])
+            .move_to(stats_panel.get_center())
+            .align_to(stats_panel, LEFT)
+            .shift(RIGHT * 0.2)
         )
 
         active_range = self.build_active_range_box(events[0], bars)
@@ -92,8 +105,15 @@ class QuickSortBars(Scene):
 
         for event in events[1:]:
             target_bars, target_labels, _ = self.build_bars(event, len(data), max_value)
-            target_message = Text(event.message, font_size=self.MESSAGE_FONT_SIZE, color=GRAY_A).to_edge(DOWN, buff=0.38)
-            target_stats = self.build_stats_text(event).move_to(stats_text).align_to(stats_panel, LEFT).shift(RIGHT * 0.2)
+            target_message = Text(
+                event.message, font_size=self.MESSAGE_FONT_SIZE, color=GRAY_A
+            ).to_edge(DOWN, buff=0.38)
+            target_stats = (
+                self.build_stats_text(event)
+                .move_to(stats_text)
+                .align_to(stats_panel, LEFT)
+                .shift(RIGHT * 0.2)
+            )
             target_range = self.build_active_range_box(event, target_bars)
             target_pivot = self.build_pivot_marker(event, target_bars)
 
@@ -109,7 +129,9 @@ class QuickSortBars(Scene):
 
             if event.compare_indices:
                 highlights = VGroup(*[bars[i] for i in event.compare_indices])
-                self.play(Indicate(highlights, color=ORANGE, scale_factor=1.02), run_time=0.18)
+                self.play(
+                    Indicate(highlights, color=ORANGE, scale_factor=1.02), run_time=0.18
+                )
 
             if len(event.swap_indices) == 2:
                 left_idx, right_idx = event.swap_indices
@@ -130,14 +152,20 @@ class QuickSortBars(Scene):
                     run_time=0.26,
                 )
 
-        final_badge = Text("Sorted", font_size=48, weight=BOLD, color=GREEN_A).next_to(subtitle, DOWN, buff=0.12)
+        final_badge = Text("Sorted", font_size=48, weight=BOLD, color=GREEN_A).next_to(
+            subtitle, DOWN, buff=0.12
+        )
         complexity = VGroup(
             Text("Average: O(n log n)", font_size=24, color=GRAY_A),
             Text("Worst: O(n^2)", font_size=24, color=GRAY_A),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.05)
         complexity.to_edge(DOWN, buff=0.28).shift(UP * 0.28 + LEFT * 4.35)
 
-        self.play(FadeOut(message, shift=0.12 * DOWN), FadeIn(complexity, shift=0.1 * UP), run_time=0.6)
+        self.play(
+            FadeOut(message, shift=0.12 * DOWN),
+            FadeIn(complexity, shift=0.1 * UP),
+            run_time=0.6,
+        )
         self.play(FadeIn(final_badge, scale=0.94), run_time=0.6)
         self.wait(1.2)
 
@@ -146,10 +174,16 @@ class QuickSortBars(Scene):
         base.set_fill(color="#05070f", opacity=1.0)
         base.set_stroke(width=0)
 
-        glow_1 = Circle(radius=3.6).set_fill(color=BLUE_E, opacity=0.16).set_stroke(width=0)
+        glow_1 = (
+            Circle(radius=3.6).set_fill(color=BLUE_E, opacity=0.16).set_stroke(width=0)
+        )
         glow_1.move_to(np.array([-4.4, 2.5, 0]))
 
-        glow_2 = Circle(radius=3.9).set_fill(color=PURPLE_E, opacity=0.11).set_stroke(width=0)
+        glow_2 = (
+            Circle(radius=3.9)
+            .set_fill(color=PURPLE_E, opacity=0.11)
+            .set_stroke(width=0)
+        )
         glow_2.move_to(np.array([4.8, -2.8, 0]))
 
         grid = NumberPlane(

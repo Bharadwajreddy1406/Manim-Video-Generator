@@ -32,13 +32,17 @@ Use static images when:
 ```python
 from manim import *
 
+
 class LinearFlow(Scene):
     def construct(self):
         def make_node(label, color=BLUE):
             rect = RoundedRectangle(
-                width=2, height=1, corner_radius=0.15,
-                fill_color=color, fill_opacity=0.3,
-                stroke_color=color
+                width=2,
+                height=1,
+                corner_radius=0.15,
+                fill_color=color,
+                fill_opacity=0.3,
+                stroke_color=color,
             )
             text = Text(label, font_size=20)
             text.move_to(rect)
@@ -48,13 +52,13 @@ class LinearFlow(Scene):
         nodes = VGroup(
             make_node("Input", GREEN),
             make_node("Process", BLUE),
-            make_node("Output", PURPLE)
+            make_node("Output", PURPLE),
         ).arrange(RIGHT, buff=1.5)
 
         # Create arrows
         arrows = VGroup(
             Arrow(nodes[0].get_right(), nodes[1].get_left(), buff=0.1),
-            Arrow(nodes[1].get_right(), nodes[2].get_left(), buff=0.1)
+            Arrow(nodes[1].get_right(), nodes[2].get_left(), buff=0.1),
         )
 
         # Animate
@@ -71,8 +75,8 @@ class BranchingFlow(Scene):
     def construct(self):
         # Decision diamond
         decision = VGroup(
-            Square(side_length=1.2, color=YELLOW).rotate(PI/4),
-            Text("?", font_size=24)
+            Square(side_length=1.2, color=YELLOW).rotate(PI / 4),
+            Text("?", font_size=24),
         )
 
         yes_path = make_node("Success", GREEN).shift(RIGHT * 3 + UP * 1.5)
@@ -81,13 +85,19 @@ class BranchingFlow(Scene):
         yes_arrow = Arrow(decision.get_corner(UR), yes_path.get_left(), buff=0.1)
         no_arrow = Arrow(decision.get_corner(DR), no_path.get_left(), buff=0.1)
 
-        yes_label = Text("Yes", font_size=16, color=GREEN).next_to(yes_arrow, UP, buff=0.1)
+        yes_label = Text("Yes", font_size=16, color=GREEN).next_to(
+            yes_arrow, UP, buff=0.1
+        )
         no_label = Text("No", font_size=16, color=RED).next_to(no_arrow, DOWN, buff=0.1)
 
         self.play(Create(decision))
         self.play(
-            GrowArrow(yes_arrow), FadeIn(yes_label), GrowFromCenter(yes_path),
-            GrowArrow(no_arrow), FadeIn(no_label), GrowFromCenter(no_path)
+            GrowArrow(yes_arrow),
+            FadeIn(yes_label),
+            GrowFromCenter(yes_path),
+            GrowArrow(no_arrow),
+            FadeIn(no_label),
+            GrowFromCenter(no_path),
         )
         self.wait()
 ```
@@ -158,15 +168,18 @@ class LinkedList(Scene):
         for i in range(len(nodes) - 1):
             arr = Arrow(
                 nodes[i][2].get_center(),
-                nodes[i+1][0].get_left(),
-                buff=0.1, color=GRAY
+                nodes[i + 1][0].get_left(),
+                buff=0.1,
+                color=GRAY,
             )
             arrows.append(arr)
 
         # Null terminator
         null = Text("∅", font_size=24, color=GRAY)
         null.next_to(nodes[-1], RIGHT, buff=0.5)
-        null_arrow = Arrow(nodes[-1][2].get_center(), null.get_left(), buff=0.1, color=GRAY)
+        null_arrow = Arrow(
+            nodes[-1][2].get_center(), null.get_left(), buff=0.1, color=GRAY
+        )
 
         # Animate construction
         for i, node in enumerate(nodes):
@@ -191,7 +204,7 @@ class BeforeAfter(Scene):
 
         before_content = VGroup(
             Rectangle(width=3, height=2, color=RED, fill_opacity=0.3),
-            Text("Broken", font_size=20, color=RED)
+            Text("Broken", font_size=20, color=RED),
         )
         before_content[1].move_to(before_content[0])
         before_content.shift(LEFT * 3)
@@ -202,16 +215,14 @@ class BeforeAfter(Scene):
 
         after_content = VGroup(
             Rectangle(width=3, height=2, color=GREEN, fill_opacity=0.3),
-            Text("Fixed", font_size=20, color=GREEN)
+            Text("Fixed", font_size=20, color=GREEN),
         )
         after_content[1].move_to(after_content[0])
         after_content.shift(RIGHT * 3)
 
         # Arrow between
         transform_arrow = Arrow(
-            before_content.get_right(),
-            after_content.get_left(),
-            buff=0.3, color=WHITE
+            before_content.get_right(), after_content.get_left(), buff=0.3, color=WHITE
         )
 
         # Animate
@@ -231,8 +242,12 @@ class IndexMatching(Scene):
     def construct(self):
         def make_slot(label, color):
             rect = RoundedRectangle(
-                width=1.5, height=0.7, corner_radius=0.1,
-                fill_color=color, fill_opacity=0.3, stroke_color=color
+                width=1.5,
+                height=0.7,
+                corner_radius=0.1,
+                fill_color=color,
+                fill_opacity=0.3,
+                stroke_color=color,
             )
             text = Text(label, font_size=16)
             text.move_to(rect)
@@ -240,19 +255,21 @@ class IndexMatching(Scene):
 
         # Row 1: First render
         r1_label = Text("Render 1", font_size=18, color=GRAY).shift(LEFT * 4 + UP * 1.5)
-        r1_slots = VGroup(
-            make_slot("A", BLUE),
-            make_slot("B", BLUE),
-            make_slot("C", PURPLE)
-        ).arrange(RIGHT, buff=0.5).next_to(r1_label, RIGHT, buff=0.5)
+        r1_slots = (
+            VGroup(make_slot("A", BLUE), make_slot("B", BLUE), make_slot("C", PURPLE))
+            .arrange(RIGHT, buff=0.5)
+            .next_to(r1_label, RIGHT, buff=0.5)
+        )
 
         # Row 2: Matching render
-        r2_label = Text("Render 2", font_size=18, color=GRAY).shift(LEFT * 4 + DOWN * 0.5)
-        r2_slots = VGroup(
-            make_slot("A", BLUE),
-            make_slot("B", BLUE),
-            make_slot("C", PURPLE)
-        ).arrange(RIGHT, buff=0.5).next_to(r2_label, RIGHT, buff=0.5)
+        r2_label = Text("Render 2", font_size=18, color=GRAY).shift(
+            LEFT * 4 + DOWN * 0.5
+        )
+        r2_slots = (
+            VGroup(make_slot("A", BLUE), make_slot("B", BLUE), make_slot("C", PURPLE))
+            .arrange(RIGHT, buff=0.5)
+            .next_to(r2_label, RIGHT, buff=0.5)
+        )
 
         # Match lines
         matches = VGroup()
@@ -260,7 +277,8 @@ class IndexMatching(Scene):
             line = DashedLine(
                 r1_slots[i].get_bottom(),
                 r2_slots[i].get_top(),
-                color=GREEN, dash_length=0.1
+                color=GREEN,
+                dash_length=0.1,
             )
             matches.add(line)
 
@@ -268,7 +286,9 @@ class IndexMatching(Scene):
         checks = VGroup()
         for i in range(3):
             check = Text("✓", font_size=20, color=GREEN)
-            check.move_to((r1_slots[i].get_center() + r2_slots[i].get_center()) / 2 + RIGHT * 0.4)
+            check.move_to(
+                (r1_slots[i].get_center() + r2_slots[i].get_center()) / 2 + RIGHT * 0.4
+            )
             checks.add(check)
 
         # Animate
@@ -293,7 +313,7 @@ class StepProcess(Scene):
         for i, step in enumerate(steps):
             node = VGroup(
                 Circle(radius=0.5, color=BLUE, fill_opacity=0.3),
-                Text(step, font_size=14)
+                Text(step, font_size=14),
             )
             node[1].move_to(node[0])
             nodes.add(node)
@@ -302,7 +322,9 @@ class StepProcess(Scene):
 
         arrows = VGroup()
         for i in range(len(nodes) - 1):
-            arr = Arrow(nodes[i].get_right(), nodes[i+1].get_left(), buff=0.1, color=GRAY)
+            arr = Arrow(
+                nodes[i].get_right(), nodes[i + 1].get_left(), buff=0.1, color=GRAY
+            )
             arrows.add(arr)
 
         # Build
@@ -311,10 +333,7 @@ class StepProcess(Scene):
 
         # Highlight progress
         for i, node in enumerate(nodes):
-            self.play(
-                node[0].animate.set_fill(GREEN, opacity=0.5),
-                run_time=0.5
-            )
+            self.play(node[0].animate.set_fill(GREEN, opacity=0.5), run_time=0.5)
             self.wait(0.3)
 
         self.wait()
@@ -330,15 +349,14 @@ class ErrorHighlight(Scene):
         # Correct state
         correct = VGroup(
             RoundedRectangle(width=2, height=1, color=GREEN),
-            Text("Valid", font_size=20)
+            Text("Valid", font_size=20),
         )
         correct[1].move_to(correct[0])
         correct.shift(LEFT * 3)
 
         # Error state
         error = VGroup(
-            RoundedRectangle(width=2, height=1, color=RED),
-            Text("Error", font_size=20)
+            RoundedRectangle(width=2, height=1, color=RED), Text("Error", font_size=20)
         )
         error[1].move_to(error[0])
         error.shift(RIGHT * 3)
@@ -390,14 +408,14 @@ For GIFs that loop:
 
 ```python
 # High contrast combinations
-SUCCESS_BG = "#1a472a"   # Dark green
-SUCCESS_FG = "#4ade80"   # Light green
+SUCCESS_BG = "#1a472a"  # Dark green
+SUCCESS_FG = "#4ade80"  # Light green
 
-ERROR_BG = "#4a1a1a"     # Dark red
-ERROR_FG = "#f87171"     # Light red
+ERROR_BG = "#4a1a1a"  # Dark red
+ERROR_FG = "#f87171"  # Light red
 
-NEUTRAL_BG = "#1a1a2e"   # Dark blue
-NEUTRAL_FG = "#60a5fa"   # Light blue
+NEUTRAL_BG = "#1a1a2e"  # Dark blue
+NEUTRAL_FG = "#60a5fa"  # Light blue
 ```
 
 ### Reduce Visual Noise

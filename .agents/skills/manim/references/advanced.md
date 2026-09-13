@@ -11,6 +11,7 @@ Scene with a movable camera that can pan and zoom.
 ```python
 from manim import *
 
+
 class CameraDemo(MovingCameraScene):
     def construct(self):
         square = Square().shift(LEFT * 3)
@@ -18,15 +19,11 @@ class CameraDemo(MovingCameraScene):
         self.add(square, circle)
 
         # Zoom to square
-        self.play(
-            self.camera.frame.animate.move_to(square).set(width=square.width * 2)
-        )
+        self.play(self.camera.frame.animate.move_to(square).set(width=square.width * 2))
         self.wait(0.5)
 
         # Pan to circle
-        self.play(
-            self.camera.frame.animate.move_to(circle).set(width=circle.width * 2)
-        )
+        self.play(self.camera.frame.animate.move_to(circle).set(width=circle.width * 2))
         self.wait(0.5)
 
         # Reset to full view
@@ -62,6 +59,7 @@ For displaying a zoomed portion while showing the full scene.
 ```python
 from manim import *
 
+
 class ZoomDemo(ZoomedScene):
     def construct(self):
         dot = Dot()
@@ -78,6 +76,7 @@ class ZoomDemo(ZoomedScene):
 
 ```python
 from manim import *
+
 
 class ThreeD(ThreeDScene):
     def construct(self):
@@ -96,9 +95,9 @@ class ThreeD(ThreeDScene):
 ```python
 # Set camera orientation
 self.set_camera_orientation(
-    phi=60 * DEGREES,    # Polar angle (0=top, 90=side)
-    theta=-45 * DEGREES, # Azimuthal angle (rotation around Z)
-    gamma=0,             # Roll angle
+    phi=60 * DEGREES,  # Polar angle (0=top, 90=side)
+    theta=-45 * DEGREES,  # Azimuthal angle (rotation around Z)
+    gamma=0,  # Roll angle
     zoom=1,
 )
 
@@ -136,6 +135,7 @@ Animate a numeric value that other objects can track.
 
 ```python
 from manim import *
+
 
 class ValueTrackerDemo(Scene):
     def construct(self):
@@ -202,6 +202,7 @@ def update_func(mob, dt):
     """dt = time since last frame"""
     mob.rotate(dt * PI)  # Rotate continuously
 
+
 circle.add_updater(update_func)
 ```
 
@@ -212,7 +213,9 @@ For 2D motion tracking.
 ```python
 tracker = ComplexValueTracker(complex(0, 0))
 dot = Dot()
-dot.add_updater(lambda m: m.move_to([tracker.get_value().real, tracker.get_value().imag, 0]))
+dot.add_updater(
+    lambda m: m.move_to([tracker.get_value().real, tracker.get_value().imag, 0])
+)
 
 self.play(tracker.animate.set_value(complex(3, 2)))
 ```
@@ -224,12 +227,11 @@ HTML-like text formatting (alternative to Text with t2c).
 ```python
 from manim import *
 
+
 class MarkupDemo(Scene):
     def construct(self):
         # Basic formatting
-        text = MarkupText(
-            '<b>Bold</b> and <i>italic</i> and <u>underline</u>'
-        )
+        text = MarkupText("<b>Bold</b> and <i>italic</i> and <u>underline</u>")
 
         # Colors
         text2 = MarkupText(
@@ -237,19 +239,13 @@ class MarkupDemo(Scene):
         )
 
         # Font mixing
-        text3 = MarkupText(
-            'Normal <span font_family="monospace">monospace</span> text'
-        )
+        text3 = MarkupText('Normal <span font_family="monospace">monospace</span> text')
 
         # Size
-        text4 = MarkupText(
-            '<big>Big</big> normal <small>small</small>'
-        )
+        text4 = MarkupText("<big>Big</big> normal <small>small</small>")
 
         # Subscript/superscript
-        text5 = MarkupText(
-            'H<sub>2</sub>O and x<sup>2</sup>'
-        )
+        text5 = MarkupText("H<sub>2</sub>O and x<sup>2</sup>")
 ```
 
 **When to use MarkupText over Text:**
@@ -292,6 +288,7 @@ config.frame_rate = 60
 config.pixel_height = 1080
 config.pixel_width = 1920
 
+
 class MyScene(Scene):
     def construct(self):
         # Access config
@@ -303,6 +300,7 @@ class MyScene(Scene):
 
 ```python
 from manim import *
+
 
 class HighQualityScene(Scene):
     def __init__(self, **kwargs):
@@ -478,6 +476,7 @@ tex = MathTex(r"\mathbb{R}", tex_template=myTemplate)
 ```python
 # List all available fonts
 import manimpango
+
 fonts = manimpango.list_fonts()
 print(fonts)  # ['Arial', 'Courier New', ...]
 ```
@@ -488,6 +487,7 @@ print(fonts)  # ['Arial', 'Courier New', ...]
 ```python
 # Check if font exists
 import manimpango
+
 if "My Font" in manimpango.list_fonts():
     text = Text("Hello", font="My Font")
 else:
@@ -515,6 +515,7 @@ text = Text("Hello", font="MyFont")
 def safe_text(content, preferred_font="SF Pro", fallback_font="Arial"):
     """Create text with font fallback."""
     import manimpango
+
     fonts = manimpango.list_fonts()
 
     if preferred_font in fonts:
@@ -605,10 +606,10 @@ from manim import ManimColor, RED, BLUE
 color = ManimColor.from_hex("#FF5733")
 
 # Convert between formats
-rgb = color.to_rgb()        # [0-1, 0-1, 0-1]
-rgba = color.to_rgba()      # [0-1, 0-1, 0-1, 0-1]
-int_rgb = color.to_int_rgb() # [0-255, 0-255, 0-255]
-hex_str = color.to_hex()     # "#FF5733"
+rgb = color.to_rgb()  # [0-1, 0-1, 0-1]
+rgba = color.to_rgba()  # [0-1, 0-1, 0-1, 0-1]
+int_rgb = color.to_int_rgb()  # [0-255, 0-255, 0-255]
+hex_str = color.to_hex()  # "#FF5733"
 
 # Create from RGB
 color = ManimColor.from_rgb([1.0, 0.5, 0.2])
@@ -659,11 +660,13 @@ SurroundingRectangle(mob1, mob2, mob3, color=YELLOW)
 # OLD (broken): Sector(inner_radius=0.5, outer_radius=1)
 # NEW: Use AnnularSector for ring sectors
 from manim import AnnularSector
-sector = AnnularSector(inner_radius=0.5, outer_radius=1, angle=PI/3)
+
+sector = AnnularSector(inner_radius=0.5, outer_radius=1, angle=PI / 3)
 
 # For simple sectors, use radius and angle
 from manim import Sector
-sector = Sector(outer_radius=1, angle=PI/3)
+
+sector = Sector(outer_radius=1, angle=PI / 3)
 ```
 
 ### Code Mobject Rewrite
@@ -683,7 +686,7 @@ Code(code_string="print('hello')", language="python")
 ```python
 square = Square(side_length=2)
 current = square.side_length  # Getter
-square.side_length = 3        # Setter (updates geometry)
+square.side_length = 3  # Setter (updates geometry)
 ```
 
 ## v0.19 New Features
@@ -703,8 +706,8 @@ contrasting = color.contrasting()
 ### Coordinate Shorthand
 ```python
 # @ shorthand for coords_to_point and point_to_coords
-point = axes @ (2, 3)       # Same as axes.c2p(2, 3)
-coords = axes @ point       # Same as axes.p2c(point)
+point = axes @ (2, 3)  # Same as axes.c2p(2, 3)
+coords = axes @ point  # Same as axes.p2c(point)
 ```
 
 ### Add Animation
@@ -726,16 +729,16 @@ tracker = ValueTracker(10)
 result = tracker // 3  # Returns ValueTracker with value 3
 
 # Modulo
-result = tracker % 3   # Returns ValueTracker with value 1
+result = tracker % 3  # Returns ValueTracker with value 1
 
 # Power
-result = tracker ** 2  # Returns ValueTracker with value 100
+result = tracker**2  # Returns ValueTracker with value 100
 
 # Multiplication
-result = tracker * 2   # Returns ValueTracker with value 20
+result = tracker * 2  # Returns ValueTracker with value 20
 
 # Division
-result = tracker / 2   # Returns ValueTracker with value 5.0
+result = tracker / 2  # Returns ValueTracker with value 5.0
 ```
 
 ### HSV Color Class
@@ -748,14 +751,13 @@ from manim import HSV
 # Create color from HSV values (h: 0-1, s: 0-1, v: 0-1)
 color = HSV(0.5, 1.0, 1.0)  # Cyan
 
+
 # Animate through rainbow
 class RainbowDemo(Scene):
     def construct(self):
         tracker = ValueTracker(0)
         circle = Circle()
-        circle.add_updater(
-            lambda m: m.set_color(HSV(tracker.get_value(), 1, 1))
-        )
+        circle.add_updater(lambda m: m.set_color(HSV(tracker.get_value(), 1, 1)))
         self.add(circle)
         self.play(tracker.animate.set_value(1), run_time=3)
 ```
@@ -810,6 +812,7 @@ from manim import *
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 
+
 class VoiceoverDemo(VoiceoverScene):
     def construct(self):
         self.set_speech_service(AzureService())
@@ -832,6 +835,7 @@ pip install manim-slides
 ```python
 from manim import *
 from manim_slides import Slide
+
 
 class MySlides(Slide):
     def construct(self):
@@ -860,6 +864,7 @@ pip install manim-physics
 ```python
 from manim import *
 from manim_physics import *
+
 
 class FallingBalls(SpaceScene):
     def construct(self):

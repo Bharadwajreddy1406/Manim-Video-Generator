@@ -68,6 +68,7 @@ If `uv` is not found, restart the terminal and run `where uv` again.
 ```python
 from manim import *
 
+
 class MyScene(Scene):
     def construct(self):
         # Create mobjects
@@ -101,9 +102,9 @@ code = Code(
     code_string="""function example() {
   return 42;
 }""",
-    language="javascript",       # Specify explicitly (auto-detect is flaky)
-    background="rectangle",      # or "window"
-    formatter_style="monokai",   # pygments style
+    language="javascript",  # Specify explicitly (auto-detect is flaky)
+    background="rectangle",  # or "window"
+    formatter_style="monokai",  # pygments style
 )
 
 # Get available styles
@@ -147,11 +148,7 @@ line = Line(ORIGIN, UP * 2)
 ### Graphs and Axes
 
 ```python
-axes = Axes(
-    x_range=[-3, 3, 1],
-    y_range=[-5, 5, 1],
-    axis_config={"color": BLUE}
-)
+axes = Axes(x_range=[-3, 3, 1], y_range=[-5, 5, 1], axis_config={"color": BLUE})
 graph = axes.plot(lambda x: x**2, color=WHITE)
 label = axes.get_graph_label(graph, label="x^2")
 ```
@@ -164,14 +161,14 @@ label = axes.get_graph_label(graph, label="x^2")
 # Create vs Write:
 # - Create: Simple stroke drawing (use for shapes)
 # - Write: Hand-writing effect with border-then-fill (use for text)
-self.play(Create(circle))       # For shapes
-self.play(Write(text))          # For Text/Tex/MathTex
+self.play(Create(circle))  # For shapes
+self.play(Write(text))  # For Text/Tex/MathTex
 
-self.play(FadeIn(mob))          # Fade in
+self.play(FadeIn(mob))  # Fade in
 self.play(FadeIn(mob, shift=UP))  # Fade in with direction
-self.play(FadeOut(mob))         # Fade out
+self.play(FadeOut(mob))  # Fade out
 self.play(GrowFromCenter(mob))  # Grow from center
-self.wait(1)                    # Pause 1 second
+self.wait(1)  # Pause 1 second
 ```
 
 ### The .animate Syntax
@@ -206,12 +203,7 @@ self.play(ReplacementTransform(old, new))
 
 ```python
 # Multiple objects at once
-self.play(
-    Create(circle),
-    Write(text),
-    FadeIn(arrow),
-    run_time=2
-)
+self.play(Create(circle), Write(text), FadeIn(arrow), run_time=2)
 ```
 
 ## Positioning
@@ -244,8 +236,8 @@ mob.align_to(other, UP)  # Align top edges
 
 ```python
 group = VGroup(circle, square, text)
-group.arrange(RIGHT, buff=0.5)           # Horizontal layout
-group.arrange(DOWN, aligned_edge=LEFT)   # Vertical, left-aligned
+group.arrange(RIGHT, buff=0.5)  # Horizontal layout
+group.arrange(DOWN, aligned_edge=LEFT)  # Vertical, left-aligned
 
 # Grid layout
 boxes = VGroup(*[Square() for _ in range(6)])
@@ -268,8 +260,9 @@ color = "#61DAFB"
 
 # Color modules (v0.19+)
 from manim.utils.color import X11, XKCD
-beige = X11.BEIGE      # '#F5F5DC'
-mango = XKCD.MANGO     # '#FFA62B'
+
+beige = X11.BEIGE  # '#F5F5DC'
+mango = XKCD.MANGO  # '#FFA62B'
 ```
 
 ## Rendering Commands

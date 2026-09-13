@@ -227,7 +227,7 @@ self.play(MoveAlongPath(mobject, path, run_time=2))
 ### Rotate
 
 ```python
-self.play(Rotate(mobject, angle=PI/2))
+self.play(Rotate(mobject, angle=PI / 2))
 self.play(Rotate(mobject, angle=PI, about_point=ORIGIN))
 ```
 
@@ -236,7 +236,7 @@ self.play(Rotate(mobject, angle=PI, about_point=ORIGIN))
 Continuous rotation.
 
 ```python
-self.play(Rotating(mobject, radians=2*PI, run_time=2))
+self.play(Rotating(mobject, radians=2 * PI, run_time=2))
 ```
 
 ### Circumscribe
@@ -314,13 +314,7 @@ self.play(mob.animate.shift(RIGHT))
 ### Chainable
 
 ```python
-self.play(
-    mob.animate
-    .shift(RIGHT * 2)
-    .scale(0.5)
-    .set_color(BLUE)
-    .rotate(PI/4)
-)
+self.play(mob.animate.shift(RIGHT * 2).scale(0.5).set_color(BLUE).rotate(PI / 4))
 ```
 
 ### Common .animate Methods
@@ -369,16 +363,17 @@ Control animation timing curve. Rate functions define progress based on relative
 from manim import *
 
 # Commonly used (exported, use directly)
-self.play(Create(mob), rate_func=linear)           # Constant speed
-self.play(Create(mob), rate_func=smooth)           # Default, smooth ease (sigmoid)
-self.play(Create(mob), rate_func=rush_into)        # Slow start, fast end
-self.play(Create(mob), rate_func=rush_from)        # Fast start, slow end
-self.play(Create(mob), rate_func=there_and_back)   # Go and return (good for emphasis)
-self.play(Create(mob), rate_func=wiggle)           # Wiggle motion
-self.play(Create(mob), rate_func=double_smooth)    # Extra smooth
+self.play(Create(mob), rate_func=linear)  # Constant speed
+self.play(Create(mob), rate_func=smooth)  # Default, smooth ease (sigmoid)
+self.play(Create(mob), rate_func=rush_into)  # Slow start, fast end
+self.play(Create(mob), rate_func=rush_from)  # Fast start, slow end
+self.play(Create(mob), rate_func=there_and_back)  # Go and return (good for emphasis)
+self.play(Create(mob), rate_func=wiggle)  # Wiggle motion
+self.play(Create(mob), rate_func=double_smooth)  # Extra smooth
 
 # Standard easing (need import)
 from manim.utils import rate_functions
+
 self.play(Create(mob), rate_func=rate_functions.ease_in_sine)
 self.play(Create(mob), rate_func=rate_functions.ease_out_sine)
 self.play(Create(mob), rate_func=rate_functions.ease_in_out_sine)
@@ -404,12 +399,7 @@ self.play(Create(group, lag_ratio=0.5))  # Each starts as previous is 50% done
 ### Multiple in One Play
 
 ```python
-self.play(
-    Create(circle),
-    Write(text),
-    FadeIn(arrow),
-    run_time=2
-)
+self.play(Create(circle), Write(text), FadeIn(arrow), run_time=2)
 ```
 
 ### AnimationGroup
@@ -423,19 +413,16 @@ from manim import AnimationGroup
 # 0 = all start together
 # 1 = each starts when previous ends
 # 0.5 = each starts when previous is 50% done
-self.play(AnimationGroup(
-    Create(circle),
-    Write(text),
-    FadeIn(arrow),
-    lag_ratio=0.5
-))
+self.play(AnimationGroup(Create(circle), Write(text), FadeIn(arrow), lag_ratio=0.5))
 
 # Nested groups with different timings
-self.play(AnimationGroup(
-    AnimationGroup(FadeIn(a), FadeIn(b), lag_ratio=0),  # Simultaneous
-    AnimationGroup(FadeIn(c), FadeIn(d), lag_ratio=1),  # Sequential
-    lag_ratio=0.5
-))
+self.play(
+    AnimationGroup(
+        AnimationGroup(FadeIn(a), FadeIn(b), lag_ratio=0),  # Simultaneous
+        AnimationGroup(FadeIn(c), FadeIn(d), lag_ratio=1),  # Sequential
+        lag_ratio=0.5,
+    )
+)
 ```
 
 ### LaggedStart
@@ -445,10 +432,12 @@ Same as `AnimationGroup` but with default `lag_ratio=0.05`.
 ```python
 from manim import LaggedStart
 
-self.play(LaggedStart(
-    *[FadeIn(mob) for mob in group],
-    lag_ratio=0.2  # Override default
-))
+self.play(
+    LaggedStart(
+        *[FadeIn(mob) for mob in group],
+        lag_ratio=0.2,  # Override default
+    )
+)
 ```
 
 ### LaggedStartMap
@@ -476,18 +465,16 @@ Sequential animations (like `AnimationGroup` with `lag_ratio=1`).
 from manim import Succession
 
 # Each animation starts after the previous ends
-self.play(Succession(
-    Create(circle),
-    Write(text),
-    FadeIn(arrow)
-))
+self.play(Succession(Create(circle), Write(text), FadeIn(arrow)))
 
 # With run_time, the total time is divided among animations
-self.play(Succession(
-    Create(circle),
-    Write(text),
-    run_time=4  # 2 seconds each
-))
+self.play(
+    Succession(
+        Create(circle),
+        Write(text),
+        run_time=4,  # 2 seconds each
+    )
+)
 ```
 
 ## Timing Control
@@ -495,9 +482,9 @@ self.play(Succession(
 ### Wait
 
 ```python
-self.wait()       # Default 1 second
-self.wait(2)      # 2 seconds
-self.wait(0.5)    # Half second
+self.wait()  # Default 1 second
+self.wait(2)  # 2 seconds
+self.wait(0.5)  # Half second
 ```
 
 ### Add (No Animation)
@@ -524,9 +511,12 @@ self.remove(mobject)
 # Follow another object
 label.add_updater(lambda m: m.next_to(circle, UP))
 
+
 # Update based on time
 def update_opacity(mob, dt):
     mob.set_opacity(mob.get_opacity() + dt * 0.1)
+
+
 circle.add_updater(update_opacity)
 
 # Remove updater
@@ -540,9 +530,7 @@ Animate a value.
 ```python
 tracker = ValueTracker(0)
 
-number = DecimalNumber(0).add_updater(
-    lambda m: m.set_value(tracker.get_value())
-)
+number = DecimalNumber(0).add_updater(lambda m: m.set_value(tracker.get_value()))
 
 self.play(tracker.animate.set_value(10), run_time=3)
 ```
@@ -552,10 +540,7 @@ self.play(tracker.animate.set_value(10), run_time=3)
 ### Fade and Replace
 
 ```python
-self.play(
-    FadeOut(old_content),
-    FadeIn(new_content)
-)
+self.play(FadeOut(old_content), FadeIn(new_content))
 ```
 
 ### Transform with Emphasis
@@ -614,9 +599,6 @@ num = DecimalNumber(0)
 self.add(num)
 
 # Function receives alpha (0 to 1 during animation)
-self.play(
-    ChangingDecimal(num, lambda alpha: alpha * 100),
-    run_time=3
-)
+self.play(ChangingDecimal(num, lambda alpha: alpha * 100), run_time=3)
 # num goes from 0 to 100 over 3 seconds
 ```

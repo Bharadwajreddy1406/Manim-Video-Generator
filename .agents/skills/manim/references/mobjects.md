@@ -24,10 +24,10 @@ text = Text("Gradient", gradient=(RED, BLUE))
 text = Text(
     "Hello World styled",
     t2c={"Hello": RED, "World[0:2]": BLUE},  # text-to-color (supports slicing)
-    t2f={"styled": "Courier New"},            # text-to-font
-    t2s={"World": ITALIC},                    # text-to-slant
-    t2w={"Hello": BOLD},                      # text-to-weight
-    t2g={"World": (RED, BLUE)},               # text-to-gradient
+    t2f={"styled": "Courier New"},  # text-to-font
+    t2s={"World": ITALIC},  # text-to-slant
+    t2w={"Hello": BOLD},  # text-to-weight
+    t2g={"World": (RED, BLUE)},  # text-to-gradient
 )
 
 # Line spacing
@@ -44,9 +44,7 @@ text = Text("Hello", warn_missing_font=False)
 HTML-like formatting for rich text.
 
 ```python
-text = MarkupText(
-    '<span foreground="red">Red</span> and <b>bold</b> and <i>italic</i>'
-)
+text = MarkupText('<span foreground="red">Red</span> and <b>bold</b> and <i>italic</i>')
 ```
 
 ### Tex and MathTex
@@ -61,21 +59,15 @@ tex = Tex(r"\LaTeX\ is great", font_size=72)
 math = MathTex(r"E = mc^2")
 
 # Multi-line math (align* allows & for alignment)
-equation = MathTex(
-    r"f(x) &= x^2 + 2x + 1 \\",
-    r"&= (x+1)^2"
-)
+equation = MathTex(r"f(x) &= x^2 + 2x + 1 \\", r"&= (x+1)^2")
 
 # Colored parts (by index) - each string becomes a submobject
 math = MathTex(r"a", r"+", r"b", r"=", r"c")
-math[0].set_color(RED)    # 'a' is red
-math[2].set_color(BLUE)   # 'b' is blue
+math[0].set_color(RED)  # 'a' is red
+math[2].set_color(BLUE)  # 'b' is blue
 
 # Using substrings_to_isolate for targeting
-math = MathTex(
-    r"e^{i\pi} + 1 = 0",
-    substrings_to_isolate=["e", r"\pi"]
-)
+math = MathTex(r"e^{i\pi} + 1 = 0", substrings_to_isolate=["e", r"\pi"])
 math.set_color_by_tex("e", RED)
 math.set_color_by_tex(r"\pi", BLUE)
 
@@ -84,12 +76,14 @@ math = MathTex(r"{{a}} + {{b}} = {{c}}")
 
 # Custom TeX template for special packages
 from manim import TexTemplate
+
 template = TexTemplate()
 template.add_to_preamble(r"\usepackage{amssymb}")
 math = MathTex(r"\mathbb{R}", tex_template=template)
 
 # Font templates
 from manim import TexFontTemplates
+
 tex = Tex("Comic Sans", tex_template=TexFontTemplates.comic_sans)
 ```
 
@@ -107,9 +101,9 @@ code = Code(
     code_string="""def hello():
     print("Hello, World!")
     return 42""",
-    language="python",           # Specify explicitly (auto-detect can fail)
-    background="rectangle",      # or "window" (macOS-style window)
-    formatter_style="monokai",   # pygments style
+    language="python",  # Specify explicitly (auto-detect can fail)
+    background="rectangle",  # or "window" (macOS-style window)
+    formatter_style="monokai",  # pygments style
     tab_width=4,
     add_line_numbers=True,
     line_numbers_from=1,
@@ -158,11 +152,12 @@ rect = Rectangle(height=2).set_width(4, stretch=True)
 
 # RoundedRectangle
 rounded = RoundedRectangle(
-    width=3, height=1.5,
+    width=3,
+    height=1.5,
     corner_radius=0.25,
     fill_color=BLUE,
     fill_opacity=0.3,
-    stroke_color=WHITE
+    stroke_color=WHITE,
 )
 
 # Ellipse
@@ -188,31 +183,33 @@ dashed = DashedLine(LEFT, RIGHT, dash_length=0.2, dashed_ratio=0.5)
 
 # Arrow with all options
 arrow = Arrow(
-    start=LEFT, end=RIGHT,
-    buff=0.1,                           # Distance from start/end points
+    start=LEFT,
+    end=RIGHT,
+    buff=0.1,  # Distance from start/end points
     stroke_width=3,
-    max_tip_length_to_length_ratio=0.2, # Tip scales with arrow length
-    max_stroke_width_to_length_ratio=5, # Stroke scales with arrow length
+    max_tip_length_to_length_ratio=0.2,  # Tip scales with arrow length
+    max_stroke_width_to_length_ratio=5,  # Stroke scales with arrow length
 )
 
 # Keep tip size when scaling
 arrow.scale(2, scale_tips=True)  # Tip scales too
-arrow.scale(2)                   # Only tail scales (default)
+arrow.scale(2)  # Only tail scales (default)
 
 # DoubleArrow
 double = DoubleArrow(LEFT, RIGHT)
 
 # CurvedArrow (angle in radians, counter-clockwise)
-curved = CurvedArrow(LEFT, RIGHT, angle=PI/2)
+curved = CurvedArrow(LEFT, RIGHT, angle=PI / 2)
 
 # CurvedDoubleArrow
-curved_double = CurvedDoubleArrow(LEFT, RIGHT, angle=PI/4)
+curved_double = CurvedDoubleArrow(LEFT, RIGHT, angle=PI / 4)
 
 # Vector (arrow from origin)
 vector = Vector(direction=UP + RIGHT)
 
 # Custom arrow tips
 from manim import ArrowTriangleFilledTip, StealthTip
+
 arrow = Arrow(LEFT, RIGHT, tip_shape=StealthTip)
 ```
 
@@ -220,23 +217,19 @@ arrow = Arrow(LEFT, RIGHT, tip_shape=StealthTip)
 
 ```python
 # Arc
-arc = Arc(radius=1, start_angle=0, angle=PI/2, color=RED)
+arc = Arc(radius=1, start_angle=0, angle=PI / 2, color=RED)
 
 # ArcBetweenPoints
-arc = ArcBetweenPoints(start=LEFT, end=RIGHT, angle=PI/4)
+arc = ArcBetweenPoints(start=LEFT, end=RIGHT, angle=PI / 4)
 
 # CubicBezier
 bezier = CubicBezier(
-    start_anchor=LEFT,
-    start_handle=LEFT + UP,
-    end_handle=RIGHT + UP,
-    end_anchor=RIGHT
+    start_anchor=LEFT, start_handle=LEFT + UP, end_handle=RIGHT + UP, end_anchor=RIGHT
 )
 
 # AnnularSector (pie slice)
 sector = AnnularSector(
-    inner_radius=1, outer_radius=2,
-    angle=PI/3, start_angle=0, color=BLUE
+    inner_radius=1, outer_radius=2, angle=PI / 3, start_angle=0, color=BLUE
 )
 ```
 
@@ -245,8 +238,8 @@ sector = AnnularSector(
 ```python
 # Brace around a mobject
 brace = Brace(mobject, direction=DOWN)
-label = brace.get_tex("width")      # LaTeX label
-text_label = brace.get_text("width") # Text label
+label = brace.get_tex("width")  # LaTeX label
+text_label = brace.get_text("width")  # Text label
 
 # BraceBetweenPoints (direction auto-computed)
 brace = BraceBetweenPoints(LEFT, RIGHT)
@@ -254,15 +247,18 @@ brace = BraceBetweenPoints(LEFT, RIGHT, direction=UP)  # Manual direction
 
 # BraceLabel (brace + label combined)
 from manim import BraceLabel
+
 bl = BraceLabel(mobject, "label text", brace_direction=DOWN)
 
 # BraceText (uses Text instead of MathTex)
 from manim import BraceText
+
 bt = BraceText(mobject, "plain text", brace_direction=DOWN)
 
 # ArcBrace for curved objects
 from manim import ArcBrace
-arc = Arc(angle=PI/2)
+
+arc = Arc(angle=PI / 2)
 arc_brace = ArcBrace(arc)
 
 # Combined
@@ -275,7 +271,7 @@ group = VGroup(rect, brace, label)
 
 ```python
 axes = Axes(
-    x_range=[-5, 5, 1],      # [min, max, step]
+    x_range=[-5, 5, 1],  # [min, max, step]
     y_range=[-3, 3, 1],
     x_length=10,
     y_length=6,
@@ -294,12 +290,7 @@ axes = Axes(
 graph = axes.plot(lambda x: x**2, color=WHITE, x_range=[-2, 2])
 
 # Plot with discontinuity
-graph = axes.plot(
-    lambda x: 1/x,
-    color=RED,
-    discontinuities=[0],
-    dt=0.01
-)
+graph = axes.plot(lambda x: 1 / x, color=RED, discontinuities=[0], dt=0.01)
 
 # Add graph label
 label = axes.get_graph_label(graph, label="f(x) = x^2", x_val=2)
@@ -335,7 +326,7 @@ plane = NumberPlane(
         "stroke_color": BLUE_D,
         "stroke_width": 1,
         "stroke_opacity": 0.5,
-    }
+    },
 )
 
 # Add coordinate labels to the plane
@@ -349,10 +340,7 @@ Plot curves defined by f(x, y) = 0:
 ```python
 ax = Axes()
 # Plot implicit curve: y(x-y)² - 4x - 8 = 0
-curve = ax.plot_implicit_curve(
-    lambda x, y: y * (x - y) ** 2 - 4 * x - 8,
-    color=BLUE
-)
+curve = ax.plot_implicit_curve(lambda x, y: y * (x - y) ** 2 - 4 * x - 8, color=BLUE)
 self.add(ax, curve)
 ```
 
@@ -363,12 +351,12 @@ self.add(ax, curve)
 All positioning methods use the **bounding box** center, not center of mass:
 
 ```python
-mob.get_center()   # Center of bounding box
-mob.get_top()      # Top edge center
-mob.get_bottom()   # Bottom edge center
-mob.get_left()     # Left edge center
-mob.get_right()    # Right edge center
-mob.get_corner(UR) # Upper-right corner
+mob.get_center()  # Center of bounding box
+mob.get_top()  # Top edge center
+mob.get_bottom()  # Bottom edge center
+mob.get_left()  # Left edge center
+mob.get_right()  # Right edge center
+mob.get_corner(UR)  # Upper-right corner
 
 # Note: For asymmetric shapes, get_center() may not
 # appear visually centered
@@ -378,8 +366,8 @@ mob.get_corner(UR) # Upper-right corner
 
 ```python
 # get_critical_point returns one of 9 points on bounding box
-mob.get_critical_point(UP)      # Top center
-mob.get_critical_point(UR)      # Upper-right corner
+mob.get_critical_point(UP)  # Top center
+mob.get_critical_point(UR)  # Upper-right corner
 mob.get_critical_point(ORIGIN)  # Center
 ```
 
@@ -388,9 +376,7 @@ mob.get_critical_point(ORIGIN)  # Center
 ```python
 # Basic Table (strings become Text mobjects)
 table = Table(
-    [["A", "B", "C"],
-     ["1", "2", "3"],
-     ["X", "Y", "Z"]],
+    [["A", "B", "C"], ["1", "2", "3"], ["X", "Y", "Z"]],
     row_labels=[Text("R1"), Text("R2"), Text("R3")],
     col_labels=[Text("C1"), Text("C2"), Text("C3")],
     include_outer_lines=True,
@@ -406,28 +392,26 @@ cell = table.get_cell((1, 2))
 
 # MathTable (LaTeX rendering)
 from manim import MathTable
-math_table = MathTable(
-    [[r"\pi", r"e", r"\phi"],
-     ["3.14", "2.72", "1.62"]]
-)
+
+math_table = MathTable([[r"\pi", r"e", r"\phi"], ["3.14", "2.72", "1.62"]])
 
 # IntegerTable (auto-converts to integers, rounds decimals)
 from manim import IntegerTable
+
 int_table = IntegerTable([[1, 2, 3], [4, 5, 6]])
 
 # DecimalTable (formatted decimals)
 from manim import DecimalTable
+
 dec_table = DecimalTable(
     [[1.234, 2.567], [3.891, 4.123]],
-    element_to_mobject_config={"num_decimal_places": 2}
+    element_to_mobject_config={"num_decimal_places": 2},
 )
 
 # MobjectTable (each cell is already a Mobject)
 from manim import MobjectTable
-mob_table = MobjectTable([
-    [Circle(), Square()],
-    [Triangle(), Star()]
-])
+
+mob_table = MobjectTable([[Circle(), Square()], [Triangle(), Star()]])
 ```
 
 ## Network Graphs
@@ -447,7 +431,8 @@ graph = Graph(vertices, edges, labels=True)
 
 # Custom layout
 graph = Graph(
-    vertices, edges,
+    vertices,
+    edges,
     layout="circular",  # or "tree", "planar", "random", "shell", "spectral", "spiral", "partite"
     layout_scale=2,
 )
@@ -474,6 +459,7 @@ graph = Graph(vertices, edges, edge_config=edge_config)
 
 # From NetworkX
 import networkx as nx
+
 G = nx.petersen_graph()
 graph = Graph.from_networkx(G)
 ```
@@ -544,7 +530,7 @@ svg = SVGMobject("icon.svg", height=2)  # 2 Manim units
 svg = SVGMobject("icon.svg", height=None, width=None)
 
 # Access submobjects (each SVG path is a submobject)
-svg[0].set_color(RED)   # First path
+svg[0].set_color(RED)  # First path
 svg[1].set_color(BLUE)  # Second path
 
 # Disable caching for dynamic SVGs
@@ -566,6 +552,7 @@ image.set(height=3)
 
 # Resampling for pixel art
 from manim import RESAMPLING_ALGORITHMS
+
 image.set_resampling_algorithm(RESAMPLING_ALGORITHMS["nearest"])
 ```
 
@@ -577,12 +564,7 @@ image.set_resampling_algorithm(RESAMPLING_ALGORITHMS["nearest"])
 
 ```python
 # Basic surrounding rectangle (v0.19+ syntax)
-surround = SurroundingRectangle(
-    mobject,
-    color=YELLOW,
-    buff=0.2,
-    corner_radius=0.1
-)
+surround = SurroundingRectangle(mobject, color=YELLOW, buff=0.2, corner_radius=0.1)
 
 # Multiple mobjects (v0.19+)
 surround = SurroundingRectangle(mob1, mob2, mob3, color=RED)
@@ -590,7 +572,7 @@ surround = SurroundingRectangle(mob1, mob2, mob3, color=RED)
 # Horizontal/vertical buff tuple (v0.19.1+)
 surround = SurroundingRectangle(
     mobject,
-    buff=(0.5, 0.2)  # (horizontal, vertical)
+    buff=(0.5, 0.2),  # (horizontal, vertical)
 )
 
 # IMPORTANT: v0.19 breaking change!
@@ -634,9 +616,9 @@ num = DecimalNumber(3.14159)
 # With formatting options
 num = DecimalNumber(
     number=3.14159,
-    num_decimal_places=2,      # Shows 3.14
-    include_sign=True,         # Shows +3.14
-    group_with_commas=True,    # 1,000.00
+    num_decimal_places=2,  # Shows 3.14
+    include_sign=True,  # Shows +3.14
+    group_with_commas=True,  # 1,000.00
     font_size=48,
 )
 
@@ -705,6 +687,7 @@ Use with `ThreeDScene` for 3D visualizations.
 ```python
 from manim import *
 
+
 class ThreeD(ThreeDScene):
     def construct(self):
         # Sphere
@@ -717,8 +700,8 @@ class ThreeD(ThreeDScene):
         cone = Cone(
             base_radius=1,
             height=2,
-            direction=UP,      # Points upward
-            show_base=True,    # Show circular base
+            direction=UP,  # Points upward
+            show_base=True,  # Show circular base
         )
 
         # Cylinder
@@ -762,8 +745,8 @@ arrow = Arrow3D(
     start=ORIGIN,
     end=RIGHT * 2 + UP + OUT,
     thickness=0.02,
-    height=0.3,         # Cone tip height
-    base_radius=0.08,   # Cone base radius
+    height=0.3,  # Cone tip height
+    base_radius=0.08,  # Cone base radius
     color=RED,
 )
 ```
@@ -820,7 +803,8 @@ surface = axes.plot_surface(
 ```python
 def make_node(label, color=BLUE):
     rect = RoundedRectangle(
-        width=2, height=1,
+        width=2,
+        height=1,
         corner_radius=0.15,
         fill_color=color,
         fill_opacity=0.3,
@@ -830,6 +814,7 @@ def make_node(label, color=BLUE):
     text.move_to(rect)
     return VGroup(rect, text)
 
+
 node = make_node("Server", GREEN)
 ```
 
@@ -837,12 +822,7 @@ node = make_node("Server", GREEN)
 
 ```python
 def connect_nodes(node1, node2, label=None):
-    arrow = Arrow(
-        node1.get_right(),
-        node2.get_left(),
-        buff=0.1,
-        color=GRAY
-    )
+    arrow = Arrow(node1.get_right(), node2.get_left(), buff=0.1, color=GRAY)
     if label:
         text = Text(label, font_size=14)
         text.next_to(arrow, UP, buff=0.1)

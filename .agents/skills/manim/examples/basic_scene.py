@@ -58,8 +58,7 @@ class MathExample(Scene):
 
         # More complex equation
         complex_eq = MathTex(
-            r"\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}",
-            font_size=48
+            r"\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}", font_size=48
         )
         complex_eq.next_to(equation, DOWN, buff=1)
 
@@ -79,7 +78,7 @@ class GraphExample(Scene):
             y_range=[-1, 9, 2],
             x_length=8,
             y_length=5,
-            axis_config={"color": BLUE}
+            axis_config={"color": BLUE},
         )
 
         # Plot function

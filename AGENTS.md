@@ -36,6 +36,13 @@ assets/
 shared/
     reusable Manim helpers and components
 
+scripts/
+    create.py
+    render.py
+
+docs/
+    manim_voiceover.md
+
 videos/
     _template/
         scene.py
@@ -55,6 +62,27 @@ Each video must live inside its own folder under `videos/`.
 Video-specific assets belong inside that video's `assets/` folder.
 
 Use `shared/` only for genuinely reusable code.
+
+## Project Utilities
+
+Use the repository utilities instead of manually creating numbered folders or assembling routine render commands.
+
+On Windows PowerShell, run them from the repository root:
+
+```powershell
+.\create "Project Name"
+.\create
+.\render 034
+.\render 034_project_name
+```
+
+`create` scans the numeric prefixes under `videos/`, selects the next number, and copies `videos/_template`. A supplied name is normalized to snake_case. With no name, it generates `auto_` followed by six numeric digits.
+
+`render` accepts either a project's numeric prefix or its complete folder name. It discovers every `Scene` subclass declared in that project's `scene.py`, renders with the repository's existing `uv` environment, and leaves output in `media/`.
+
+The default render quality is low. Use `--quality medium`, `--quality high`, or `--quality 4k` only when appropriate. Use `--preview` when an interactive preview is wanted.
+
+The command logic lives in `scripts/create.py` and `scripts/render.py`; `create.cmd` and `render.cmd` are only Windows launchers. Do not duplicate their numbering, lookup, or rendering logic elsewhere without a concrete need.
 
 ## Video Workflow
 
@@ -148,6 +176,8 @@ Think visually before thinking about Manim APIs.
 
 If a video includes voiceover, `script.md` is the source of truth for timing, not `scene.py`.
 
+Before implementing or changing a narrated scene, read and follow `docs/manim_voiceover.md`. It is the repository's detailed guide for `VoiceoverScene`, narration segmentation, timing, bookmarks, speech services, subcaptions, secrets, rendering, and review.
+
 Before implementing animation timing:
 
 * Confirm whether narration is pre-recorded (audio file exists in `assets/audio/`) or not yet recorded.
@@ -155,7 +185,11 @@ Before implementing animation timing:
 * If audio does not yet exist, animation timing is provisional. Note this explicitly when reporting work, since durations will likely need adjustment once real narration is recorded.
 * Do not silently invent narration timing. If timing is ambiguous or unmeasured, say so rather than assuming.
 
-If using a voiceover integration (e.g. `manim-voiceover`) rather than manually timed `self.wait()` calls, say so in `scene.py` comments so future edits don't fight the sync mechanism.
+When narration is part of the scene, prefer `manim-voiceover` and `VoiceoverScene` over guessed `self.wait()` timing. Keep speech-service selection easy to replace, and never place provider credentials in `scene.py`.
+
+Voiceover blocks must use approved narration from `script.md` and should correspond to storyboard beats or sub-beats. Use each voiceover tracker's duration, and bookmarks only where needed, to make visual timing subordinate to narration.
+
+Voiceover renders must disable Manim caching. The repository's `render` utility detects direct `manim_voiceover` imports and adds `--disable_caching` automatically. When rendering a voiceover scene manually, include that flag explicitly.
 
 Each storyboard beat should map to a narration segment. When editing `script.md`, check whether the corresponding storyboard beat still matches; when editing `storyboard.md`, check whether narration still fits the new visual pacing. These two files drift apart easily — treat a change to one as a prompt to re-check the other.
 
@@ -338,6 +372,7 @@ Manim's default `media/` output directory can grow large and disorganized across
 
 * Let Manim's default `media/` structure stand (`media/videos/<scene_file>/<quality>/`); do not manually relocate rendered files unless asked.
 * `media/` should be gitignored at the repository root. Verify this exists; add it if missing.
+* Prefer `.\render <project>` for routine project renders so scene discovery, quality selection, output location, and voiceover cache handling stay consistent.
 * Low-quality development renders (`-pql`) are disposable — do not treat them as deliverables and do not reference them in commits or documentation.
 * When a render is intended as a final deliverable, say so explicitly and note the exact output path so the user can find it without searching.
 * Do not delete previous renders unless asked. Old renders are useful for comparison during iteration.
