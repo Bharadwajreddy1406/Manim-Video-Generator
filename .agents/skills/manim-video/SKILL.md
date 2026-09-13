@@ -25,7 +25,7 @@ Use Manim for technical explainers where motion, structure, and clarity matter m
 
 ## Default Output
 
-- short 16:9 MP4
+- short vertical 9:16 MP4
 - one thumbnail or poster frame
 - storyboard plus scene plan
 
@@ -58,7 +58,8 @@ For social-graph and network-optimization explainers:
 
 ## Render Conventions
 
-- default to 16:9 landscape unless the user asks for vertical
+- honor the user's explicit format choice; use 16:9 landscape when they request horizontal
+- otherwise default to 9:16 vertical
 - start with a low-quality smoke test render
 - only push to higher quality after composition and timing are stable
 - export one clean thumbnail frame that reads at social size
