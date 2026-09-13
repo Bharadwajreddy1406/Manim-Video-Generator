@@ -1,14 +1,16 @@
-import numpy as np
+from pathlib import Path
 
 from manim import *
+from manim_voiceover import VoiceoverScene
+
+from shared.voiceover import create_speech_service
 
 
-class DerivativeInstantaneousSlope(Scene):
-    """First-pass explainer for why a derivative is an instantaneous slope.
+class DerivativeInstantaneousSlope(VoiceoverScene):
+    """Explain instantaneous slope with narration-controlled animation timing.
 
-    Timing is provisional because no recorded narration exists yet. The moving
-    secant construction is intentionally driven by one ValueTracker so its
-    geometry cannot drift out of sync.
+    Manim Voiceover is the timing authority. The moving secant construction is
+    driven by one ValueTracker so its geometry cannot drift out of sync.
     """
 
     P_X = 0.0
@@ -29,6 +31,9 @@ class DerivativeInstantaneousSlope(Scene):
 
     def construct(self):
         self.camera.background_color = "#10131A"
+        self.set_speech_service(
+            create_speech_service(Path(__file__).with_name("voiceover.json"))
+        )
 
         self.show_speed_intuition()
         graph_state = self.show_secant_graph()
@@ -91,32 +96,45 @@ class DerivativeInstantaneousSlope(Scene):
             color=self.Q_COLOR,
         ).next_to(speedometer, UP, buff=0.2)
 
-        self.play(FadeIn(title, shift=DOWN * 0.15), run_time=0.8)
-        self.play(
-            Create(time_line),
-            FadeIn(start_dot),
-            FadeIn(end_dot),
-            FadeIn(start_label),
-            FadeIn(end_label),
-            run_time=1.2,
-        )
-        self.play(
-            GrowFromCenter(interval_brace),
-            Write(average_fraction),
-            FadeIn(average_label, shift=UP * 0.1),
-            run_time=1.4,
-        )
-        self.wait(1.3)
-        self.play(
-            FadeOut(interval_brace),
-            FadeOut(average_fraction),
-            FadeOut(average_label),
-            FadeIn(speedometer),
-            FadeIn(now_label, shift=UP * 0.1),
-            end_dot.animate.scale(1.5),
-            run_time=1.3,
-        )
-        self.wait(1.2)
+        with self.voiceover(text="Imagine driving along a winding road.") as tracker:
+            self.play(
+                FadeIn(title, shift=DOWN * 0.15),
+                Create(time_line),
+                FadeIn(start_dot),
+                FadeIn(end_dot),
+                FadeIn(start_label),
+                FadeIn(end_label),
+                run_time=tracker.duration * 0.9,
+            )
+
+        with self.voiceover(
+            text=(
+                "Over ten seconds, your average speed is the distance traveled "
+                "divided by ten seconds."
+            )
+        ) as tracker:
+            self.play(
+                GrowFromCenter(interval_brace),
+                Write(average_fraction),
+                FadeIn(average_label, shift=UP * 0.1),
+                run_time=tracker.duration * 0.9,
+            )
+
+        with self.voiceover(
+            text=(
+                "But your speedometer answers a sharper question: how fast are "
+                "you moving right now?"
+            )
+        ) as tracker:
+            self.play(
+                FadeOut(interval_brace),
+                FadeOut(average_fraction),
+                FadeOut(average_label),
+                FadeIn(speedometer),
+                FadeIn(now_label, shift=UP * 0.1),
+                end_dot.animate.scale(1.5),
+                run_time=tracker.duration * 0.9,
+            )
 
         self.intro_objects = VGroup(
             title,
@@ -155,14 +173,16 @@ class DerivativeInstantaneousSlope(Scene):
             p_dot, DL, buff=0.12
         )
 
-        self.play(
-            FadeOut(self.intro_objects),
-            Create(axes),
-            FadeIn(axis_labels),
-            run_time=1.5,
-        )
-        self.play(Create(graph), FadeIn(p_dot), FadeIn(p_label), run_time=1.4)
-        self.wait(0.7)
+        with self.voiceover(text="A graph has the same distinction.") as tracker:
+            self.play(
+                FadeOut(self.intro_objects),
+                Create(axes),
+                FadeIn(axis_labels),
+                Create(graph),
+                FadeIn(p_dot),
+                FadeIn(p_label),
+                run_time=tracker.duration * 0.9,
+            )
 
         q_x = ValueTracker(2.4)
 
@@ -266,15 +286,27 @@ class DerivativeInstantaneousSlope(Scene):
             .move_to(RIGHT * 4.35 + DOWN * 0.15)
         )
 
-        self.play(FadeIn(q_dot), FadeIn(q_label), run_time=0.8)
-        self.play(
-            FadeIn(triangle),
-            Create(delta_x_guide),
-            Create(delta_y_guide),
-            Create(secant_line),
-            FadeIn(secant_label),
-            run_time=1.8,
-        )
+        with self.voiceover(text="Choose two points on a curve.") as tracker:
+            self.play(
+                FadeIn(q_dot),
+                FadeIn(q_label),
+                run_time=tracker.duration * 0.8,
+            )
+
+        with self.voiceover(
+            text=(
+                "The line through them is a secant line, and its slope measures "
+                "the average rate of change between those points."
+            )
+        ) as tracker:
+            self.play(
+                FadeIn(triangle),
+                Create(delta_x_guide),
+                Create(delta_y_guide),
+                Create(secant_line),
+                FadeIn(secant_label),
+                run_time=tracker.duration * 0.9,
+            )
 
         delta_x_label.move_to(
             axes.c2p(
@@ -284,14 +316,14 @@ class DerivativeInstantaneousSlope(Scene):
             + DOWN * 0.28
         )
         delta_y_label.next_to(delta_y_guide, RIGHT, buff=0.12)
-        self.play(
-            FadeIn(delta_x_label),
-            FadeIn(delta_y_label),
-            Write(slope_fraction),
-            FadeIn(slope_readout),
-            run_time=1.5,
-        )
-        self.wait(1.2)
+        with self.voiceover(text="Change in y, divided by change in x.") as tracker:
+            self.play(
+                FadeIn(delta_x_label),
+                FadeIn(delta_y_label),
+                Write(slope_fraction),
+                FadeIn(slope_readout),
+                run_time=tracker.duration * 0.85,
+            )
 
         return {
             "axes": axes,
@@ -318,23 +350,6 @@ class DerivativeInstantaneousSlope(Scene):
     def show_secant_to_tangent(self, state: dict):
         """Beat 3: the visual centerpiece, driven entirely by q_x."""
         q_x = state["q_x"]
-
-        self.play(
-            FadeOut(state["delta_x_label"]),
-            FadeOut(state["delta_y_label"]),
-            q_x.animate.set_value(0.62),
-            run_time=7.0,
-            rate_func=smooth,
-        )
-        self.wait(0.8)
-        self.play(
-            q_x.animate.set_value(0.08),
-            FadeOut(state["secant_label"]),
-            run_time=5.0,
-            rate_func=smooth,
-        )
-        self.play(q_x.animate.set_value(0.01), run_time=2.0, rate_func=smooth)
-
         tangent_label = Text(
             "tangent (the limiting line)",
             font_size=24,
@@ -353,13 +368,54 @@ class DerivativeInstantaneousSlope(Scene):
             stroke_width=5,
         )
         tangent_line.set_z_index(2)
-        self.play(
-            Create(tangent_line),
-            FadeIn(tangent_label, shift=UP * 0.1),
-            FadeIn(tangent_value),
-            run_time=1.5,
-        )
-        self.wait(1.4)
+
+        with self.voiceover(
+            text="Now keep the first point fixed and slide the second point closer."
+        ) as tracker:
+            self.play(
+                FadeOut(state["delta_x_label"]),
+                FadeOut(state["delta_y_label"]),
+                q_x.animate.set_value(0.85),
+                run_time=tracker.duration * 0.92,
+                rate_func=smooth,
+            )
+
+        with self.voiceover(text="The interval shrinks.") as tracker:
+            self.play(
+                q_x.animate.set_value(0.42),
+                run_time=tracker.duration * 0.9,
+                rate_func=smooth,
+            )
+
+        with self.voiceover(
+            text=(
+                "The average slope describes a smaller and smaller piece of the curve."
+            )
+        ) as tracker:
+            self.play(
+                q_x.animate.set_value(0.08),
+                FadeOut(state["secant_label"]),
+                run_time=tracker.duration * 0.92,
+                rate_func=smooth,
+            )
+
+        with self.voiceover(
+            text=(
+                "And the secant line turns toward one limiting position: the "
+                "tangent line."
+            )
+        ) as tracker:
+            self.play(
+                q_x.animate.set_value(0.01),
+                run_time=tracker.duration * 0.55,
+                rate_func=smooth,
+            )
+            self.play(
+                Create(tangent_line),
+                FadeIn(tangent_label, shift=UP * 0.1),
+                FadeIn(tangent_value),
+                run_time=tracker.duration * 0.35,
+            )
 
         state["tangent_line"] = tangent_line
         state["tangent_label"] = tangent_label
@@ -402,22 +458,24 @@ class DerivativeInstantaneousSlope(Scene):
             inset_box.get_center() + RIGHT * 1.08 + DOWN * 0.28
         )
 
-        self.play(
-            FadeOut(state["slope_fraction"]),
-            FadeOut(state["slope_readout"]),
-            FadeOut(state["tangent_label"]),
-            FadeOut(state["tangent_value"]),
-            FadeIn(inset_box),
-            FadeIn(inset_title),
-            FadeIn(mini_triangle),
-            FadeIn(mini_dx),
-            FadeIn(mini_dy),
-            FadeIn(mini_p_dot),
-            FadeIn(mini_q_dot),
-            FadeIn(mini_fraction),
-            run_time=1.4,
-        )
-        self.wait(0.8)
+        with self.voiceover(
+            text="We cannot simply put the two points in exactly the same place."
+        ) as tracker:
+            self.play(
+                FadeOut(state["slope_fraction"]),
+                FadeOut(state["slope_readout"]),
+                FadeOut(state["tangent_label"]),
+                FadeOut(state["tangent_value"]),
+                FadeIn(inset_box),
+                FadeIn(inset_title),
+                FadeIn(mini_triangle),
+                FadeIn(mini_dx),
+                FadeIn(mini_dy),
+                FadeIn(mini_p_dot),
+                FadeIn(mini_q_dot),
+                FadeIn(mini_fraction),
+                run_time=tracker.duration * 0.9,
+            )
 
         zero_fraction = MathTex(r"\frac{0}{0}", font_size=42, color=RED_C).move_to(
             mini_fraction
@@ -427,16 +485,21 @@ class DerivativeInstantaneousSlope(Scene):
             font_size=24,
             color=RED_C,
         ).next_to(zero_fraction, DOWN, buff=0.12)
-        self.play(
-            mini_triangle.animate.scale(0.02, about_point=mini_p),
-            mini_dx.animate.scale(0.02, about_point=mini_p),
-            mini_dy.animate.scale(0.02, about_point=mini_p),
-            mini_q_dot.animate.move_to(mini_p),
-            Transform(mini_fraction, zero_fraction),
-            run_time=1.8,
-        )
-        self.play(FadeIn(undefined_label, shift=UP * 0.1), run_time=0.6)
-        self.wait(1.2)
+        with self.voiceover(
+            text=("Then both changes would be zero, giving zero divided by zero.")
+        ) as tracker:
+            self.play(
+                mini_triangle.animate.scale(0.02, about_point=mini_p),
+                mini_dx.animate.scale(0.02, about_point=mini_p),
+                mini_dy.animate.scale(0.02, about_point=mini_p),
+                mini_q_dot.animate.move_to(mini_p),
+                Transform(mini_fraction, zero_fraction),
+                run_time=tracker.duration * 0.65,
+            )
+            self.play(
+                FadeIn(undefined_label, shift=UP * 0.1),
+                run_time=tracker.duration * 0.25,
+            )
 
         state["zero_inset"] = VGroup(
             inset_box,
@@ -452,11 +515,6 @@ class DerivativeInstantaneousSlope(Scene):
 
     def show_limit_definition(self, state: dict):
         """Beat 5: reveal the derivative formula in meaningful stages."""
-        self.play(
-            FadeOut(state["zero_inset"]),
-            run_time=1.0,
-        )
-
         numerator = MathTex(
             r"f(x+h)-f(x)",
             font_size=38,
@@ -474,30 +532,22 @@ class DerivativeInstantaneousSlope(Scene):
             .move_to(RIGHT * 4.35 + UP * 0.65)
         )
 
-        self.play(Write(numerator), run_time=1.0)
-        self.play(Create(fraction_bar), Write(denominator), run_time=1.0)
-        self.wait(0.6)
+        with self.voiceover(text="Instead, the derivative uses a limit.") as tracker:
+            self.play(
+                FadeOut(state["zero_inset"]),
+                run_time=tracker.duration * 0.2,
+            )
+            self.play(Write(numerator), run_time=tracker.duration * 0.32)
+            self.play(
+                Create(fraction_bar),
+                Write(denominator),
+                run_time=tracker.duration * 0.32,
+            )
 
         limit_symbol = MathTex(
             r"\lim_{h\to 0}",
             font_size=38,
         ).next_to(difference_quotient, LEFT, buff=0.18)
-        self.play(
-            difference_quotient.animate.shift(RIGHT * 0.38),
-            FadeIn(limit_symbol, shift=RIGHT * 0.15),
-            run_time=1.1,
-        )
-        self.play(Indicate(limit_symbol, color=self.Q_COLOR), run_time=0.9)
-
-        limit_group = VGroup(limit_symbol, difference_quotient)
-        derivative_name = MathTex(r"f'(x)=", font_size=38).next_to(
-            limit_group, LEFT, buff=0.18
-        )
-        self.play(
-            limit_group.animate.shift(RIGHT * 0.45),
-            FadeIn(derivative_name, shift=RIGHT * 0.15),
-            run_time=1.1,
-        )
 
         moving_geometry = VGroup(
             state["q_dot"],
@@ -507,13 +557,37 @@ class DerivativeInstantaneousSlope(Scene):
             state["delta_y_guide"],
             state["secant_line"],
         )
-        self.play(FadeOut(moving_geometry), run_time=0.5)
-        state["q_x"].set_value(0.9)
-        self.play(FadeIn(moving_geometry), run_time=0.5)
-        self.play(
-            state["q_x"].animate.set_value(0.01),
-            run_time=3.3,
-            rate_func=smooth,
+
+        with self.voiceover(
+            text=("It asks what the secant slopes approach as the gap approaches zero.")
+        ) as tracker:
+            self.play(
+                difference_quotient.animate.shift(RIGHT * 0.38),
+                FadeIn(limit_symbol, shift=RIGHT * 0.15),
+                run_time=tracker.duration * 0.2,
+            )
+            self.play(
+                Indicate(limit_symbol, color=self.Q_COLOR),
+                run_time=tracker.duration * 0.12,
+            )
+            self.play(
+                FadeOut(moving_geometry),
+                run_time=tracker.duration * 0.08,
+            )
+            state["q_x"].set_value(0.9)
+            self.play(
+                FadeIn(moving_geometry),
+                run_time=tracker.duration * 0.08,
+            )
+            self.play(
+                state["q_x"].animate.set_value(0.01),
+                run_time=tracker.duration * 0.45,
+                rate_func=smooth,
+            )
+
+        limit_group = VGroup(limit_symbol, difference_quotient)
+        derivative_name = MathTex(r"f'(x)=", font_size=38).next_to(
+            limit_group, LEFT, buff=0.18
         )
 
         correspondence = Text(
@@ -521,8 +595,31 @@ class DerivativeInstantaneousSlope(Scene):
             font_size=23,
             color=self.LINE_COLOR,
         ).move_to(RIGHT * 4.25 + DOWN * 1.15)
-        self.play(FadeIn(correspondence, shift=UP * 0.12), run_time=1.0)
-        self.wait(1.1)
+
+        with self.voiceover(
+            text=("If those slopes settle to one value, that value is the derivative.")
+        ) as tracker:
+            self.play(
+                limit_group.animate.shift(RIGHT * 0.45),
+                FadeIn(derivative_name, shift=RIGHT * 0.15),
+                run_time=tracker.duration * 0.42,
+            )
+            self.play(
+                FadeIn(correspondence, shift=UP * 0.12),
+                run_time=tracker.duration * 0.42,
+            )
+
+        with self.voiceover(
+            text=(
+                "It captures the curve's rate of change at that exact input: "
+                "the slope at an instant."
+            )
+        ) as tracker:
+            self.play(
+                Indicate(state["p_dot"], color=self.P_COLOR),
+                Indicate(state["tangent_line"], color=self.LINE_COLOR),
+                run_time=tracker.duration * 0.8,
+            )
 
         state["formula"] = VGroup(derivative_name, limit_group)
         state["correspondence"] = correspondence
@@ -530,13 +627,6 @@ class DerivativeInstantaneousSlope(Scene):
 
     def show_final_distinction(self, state: dict):
         """Beat 6: a tiny interval approximates; the limit equals."""
-        self.play(
-            FadeOut(state["formula"]),
-            FadeOut(state["correspondence"]),
-            run_time=0.8,
-        )
-        state["q_x"].set_value(0.46)
-
         tiny_interval_label = Text(
             "tiny, but nonzero",
             font_size=23,
@@ -546,31 +636,46 @@ class DerivativeInstantaneousSlope(Scene):
             r"\text{secant slope}\ \approx\ f'(x)",
             font_size=36,
         ).next_to(tiny_interval_label, DOWN, buff=0.3)
-        self.play(
-            FadeIn(tiny_interval_label),
-            Write(approximation),
-            run_time=1.1,
-        )
-        self.wait(0.8)
-
-        self.play(
-            state["q_x"].animate.set_value(0.01),
-            run_time=3.2,
-            rate_func=smooth,
-        )
 
         final_statement = MathTex(
             r"f'(x)=\text{tangent slope at }P",
             font_size=39,
             color=self.LINE_COLOR,
         ).move_to(RIGHT * 4.15 + UP * 0.3)
-        self.play(
-            FadeOut(tiny_interval_label),
-            ReplacementTransform(approximation, final_statement),
-            FadeOut(state["moving_geometry"]),
-            run_time=1.5,
-        )
-        self.wait(2.0)
+
+        with self.voiceover(
+            text=(
+                "So instantaneous slope is not measured across a tiny fixed interval."
+            )
+        ) as tracker:
+            self.play(
+                FadeOut(state["formula"]),
+                FadeOut(state["correspondence"]),
+                FadeOut(state["moving_geometry"]),
+                run_time=tracker.duration * 0.18,
+            )
+            state["q_x"].set_value(0.46)
+            self.play(
+                FadeIn(state["moving_geometry"]),
+                FadeIn(tiny_interval_label),
+                Write(approximation),
+                run_time=tracker.duration * 0.55,
+            )
+
+        with self.voiceover(
+            text=("It is the limit of average slopes as the interval vanishes.")
+        ) as tracker:
+            self.play(
+                state["q_x"].animate.set_value(0.01),
+                run_time=tracker.duration * 0.62,
+                rate_func=smooth,
+            )
+            self.play(
+                FadeOut(tiny_interval_label),
+                ReplacementTransform(approximation, final_statement),
+                FadeOut(state["moving_geometry"]),
+                run_time=tracker.duration * 0.3,
+            )
 
     def line_with_graph_slope(
         self,

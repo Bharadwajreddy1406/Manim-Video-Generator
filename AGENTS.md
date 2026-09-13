@@ -73,14 +73,16 @@ On Windows PowerShell, run them from the repository root:
 .\create "Project Name"
 .\create
 .\render 034
-.\render 034_project_name
+.\render 034_project_name --1080p60 --merge
 ```
 
 `create` scans the numeric prefixes under `videos/`, selects the next number, and copies `videos/_template`. A supplied name is normalized to snake_case. With no name, it generates `auto_` followed by six numeric digits.
 
 `render` accepts either a project's numeric prefix or its complete folder name. It discovers every `Scene` subclass declared in that project's `scene.py`, renders with the repository's existing `uv` environment, and leaves output in `media/`.
 
-The default render quality is low. Use `--quality medium`, `--quality high`, or `--quality 4k` only when appropriate. Use `--preview` when an interactive preview is wanted.
+The default render preset is `--480p15`. The explicit presets are `--480p15`, `--720p30`, `--1080p60`, and `--2160p60`; `--108060p` and `--4k60` are supported aliases. The older `--quality low|medium|high|4k` syntax remains supported. Use `--preview` only when an interactive preview is wanted.
+
+After every successful render, the utility exports a silent video track, a combined WAV narration track when audio exists, and the SRT file when available under `media/exports/<project>/<preset>/`. With `--merge`, it additionally remuxes the exported video and audio into `<Scene>_merged.mp4`. Do not remove Manim's native output in `media/videos/`.
 
 The command logic lives in `scripts/create.py` and `scripts/render.py`; `create.cmd` and `render.cmd` are only Windows launchers. Do not duplicate their numbering, lookup, or rendering logic elsewhere without a concrete need.
 
@@ -190,6 +192,10 @@ When narration is part of the scene, prefer `manim-voiceover` and `VoiceoverScen
 Voiceover blocks must use approved narration from `script.md` and should correspond to storyboard beats or sub-beats. Use each voiceover tracker's duration, and bookmarks only where needed, to make visual timing subordinate to narration.
 
 Voiceover renders must disable Manim caching. The repository's `render` utility detects direct `manim_voiceover` imports and adds `--disable_caching` automatically. When rendering a voiceover scene manually, include that flag explicitly.
+
+Each narrated project may define `voiceover.json` beside `scene.py`. Use `service`, `voice`, and `options` fields. The default service is `edge-tts` with `en-IN-NeerjaNeural`. Run `.\render --list-voices` to query all available Edge TTS voices, and use `--voice` or `--voice-service` for one-render overrides. Do not use Windows SAPI voices.
+
+Supported service names are `edge-tts`, `gtts`, `azure`, `elevenlabs`, and `openai`. Add the corresponding `manim-voiceover` extra before using a provider that requires one. Edge TTS and the other external services transmit narration text outside the computer, so do not select or invoke a new external provider without explicit user authorization. Keep API keys in environment variables or `.env`; never store credentials in `voiceover.json`, `script.md`, or `scene.py`.
 
 Each storyboard beat should map to a narration segment. When editing `script.md`, check whether the corresponding storyboard beat still matches; when editing `storyboard.md`, check whether narration still fits the new visual pacing. These two files drift apart easily — treat a change to one as a prompt to re-check the other.
 
@@ -373,6 +379,7 @@ Manim's default `media/` output directory can grow large and disorganized across
 * Let Manim's default `media/` structure stand (`media/videos/<scene_file>/<quality>/`); do not manually relocate rendered files unless asked.
 * `media/` should be gitignored at the repository root. Verify this exists; add it if missing.
 * Prefer `.\render <project>` for routine project renders so scene discovery, quality selection, output location, and voiceover cache handling stay consistent.
+* Treat `media/exports/<project>/<preset>/` as the organized delivery directory. It contains separate video/audio/subtitle assets and, when requested with `--merge`, the final merged MP4.
 * Low-quality development renders (`-pql`) are disposable — do not treat them as deliverables and do not reference them in commits or documentation.
 * When a render is intended as a final deliverable, say so explicitly and note the exact output path so the user can find it without searching.
 * Do not delete previous renders unless asked. Old renders are useful for comparison during iteration.

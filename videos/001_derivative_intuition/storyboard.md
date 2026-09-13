@@ -8,7 +8,7 @@ The tangent line is not introduced as a separate construction. It emerges contin
 
 - 16:9 landscape, approximately 75-85 seconds.
 - One continuous Manim scene with six visual beats.
-- No narration audio currently exists, so all timings are provisional and must be adjusted after voiceover is recorded.
+- Narration is generated and synchronized through `manim-voiceover` using the approved `script.md`. Beat timings are controlled by the active speech service and must be re-checked if that service or the narration changes.
 - Keep the curve and the fixed point visible from Beat 2 through the ending. This continuity is central to the explanation.
 - Use the repository's shared visual style if one is defined before implementation. At present, the shared color and typography modules are empty, so no new series-wide palette is established here.
 
@@ -109,6 +109,6 @@ End on the curve, fixed point, and tangent line with generous empty space. Remov
 - The limit equation should be the only dense mathematical expression. Reveal it in meaningful pieces rather than all at once.
 - The key thumbnail/poster frame would be the graph during Beat 3: P fixed, Q approaching, several faint secant positions, and the tangent highlighted.
 
-## Planned implementation boundary
+## Voiceover implementation
 
-The eventual scene should use one continuously controlled position for Q so the point, guides, secant, and slope readout remain synchronized. This storyboard does not prescribe final runtimes until narration audio is available.
+The scene uses one continuously controlled position for Q so the point, guides, secant, and slope readout remain synchronized. Narration is divided into sentence-level voiceover blocks that map to these beats, and animation runtimes are derived from each voiceover tracker's duration rather than fixed waits.

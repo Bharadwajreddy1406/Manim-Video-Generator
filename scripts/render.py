@@ -1,10 +1,12 @@
-"""Resolve a numbered video project and render its declared Manim scenes."""
+"""Render a numbered Manim project and prepare its delivery assets."""
 
 from __future__ import annotations
 
 import argparse
 import ast
 import importlib.util
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -18,12 +20,19 @@ else:
     from create import numbered_projects, repository_root
 
 
-QUALITY_FLAGS = {
-    "low": "-ql",
-    "medium": "-qm",
-    "high": "-qh",
-    "4k": "-qk",
+PRESETS = {
+    "480p15": ("-ql", "480p15"),
+    "720p30": ("-qm", "720p30"),
+    "1080p60": ("-qh", "1080p60"),
+    "2160p60": ("-qk", "2160p60"),
 }
+QUALITY_PRESETS = {
+    "low": "480p15",
+    "medium": "720p30",
+    "high": "1080p60",
+    "4k": "2160p60",
+}
+VOICE_SERVICES = ("edge-tts", "gtts", "azure", "elevenlabs", "openai")
 
 
 def resolve_project(identifier: str, videos_dir: Path) -> Path:
@@ -50,6 +59,10 @@ def resolve_project(identifier: str, videos_dir: Path) -> Path:
 
 
 def load_scene_module(scene_file: Path) -> ModuleType:
+    root_string = str(repository_root())
+    if root_string not in sys.path:
+        sys.path.insert(0, root_string)
+
     module_name = f"_manima_scene_{scene_file.parent.name}"
     spec = importlib.util.spec_from_file_location(module_name, scene_file)
     if spec is None or spec.loader is None:
@@ -75,7 +88,6 @@ def declared_scene_names(scene_file: Path) -> list[str]:
 
 
 def source_uses_manim_voiceover(source: str, filename: str = "<scene>") -> bool:
-    """Return whether source code directly imports Manim Voiceover."""
     tree = ast.parse(source, filename=filename)
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -85,12 +97,15 @@ def source_uses_manim_voiceover(source: str, filename: str = "<scene>") -> bool:
                 for alias in node.names
             ):
                 return True
-        elif isinstance(node, ast.ImportFrom):
-            if node.module and (
+        elif (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and (
                 node.module == "manim_voiceover"
                 or node.module.startswith("manim_voiceover.")
-            ):
-                return True
+            )
+        ):
+            return True
     return False
 
 
@@ -101,32 +116,230 @@ def uses_manim_voiceover(scene_file: Path) -> bool:
     )
 
 
+def selected_preset(args: argparse.Namespace) -> str:
+    if args.preset:
+        return args.preset
+    if args.quality:
+        return QUALITY_PRESETS[args.quality]
+    return "480p15"
+
+
+def list_edge_voices(root: Path) -> int:
+    command = [sys.executable, "-m", "edge_tts", "--list-voices"]
+    print("Available Edge TTS voices:", flush=True)
+    return subprocess.run(command, cwd=root, check=False).returncode
+
+
+def media_has_stream(path: Path, stream_selector: str, root: Path) -> bool:
+    ffprobe = shutil.which("ffprobe")
+    if ffprobe is None:
+        raise FileNotFoundError("ffprobe is required to validate exported media")
+    result = subprocess.run(
+        [
+            ffprobe,
+            "-v",
+            "error",
+            "-select_streams",
+            stream_selector,
+            "-show_entries",
+            "stream=index",
+            "-of",
+            "csv=p=0",
+            str(path),
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return bool(result.stdout.strip())
+
+
+def run_ffmpeg(arguments: list[str], root: Path) -> None:
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        raise FileNotFoundError(
+            "ffmpeg is required to export separate and merged media tracks"
+        )
+    subprocess.run(
+        [ffmpeg, "-y", "-hide_banner", "-loglevel", "error", *arguments],
+        cwd=root,
+        check=True,
+    )
+
+
+def export_scene_assets(
+    root: Path,
+    project_dir: Path,
+    scene_file: Path,
+    scene_name: str,
+    preset: str,
+    merge: bool,
+    voiceover_enabled: bool,
+) -> list[Path]:
+    _, quality_directory = PRESETS[preset]
+    native_directory = root / "media" / "videos" / scene_file.stem / quality_directory
+    native_video = native_directory / f"{scene_name}.mp4"
+    if not native_video.is_file():
+        raise FileNotFoundError(f"Rendered video not found: {native_video}")
+
+    export_directory = root / "media" / "exports" / project_dir.name / preset
+    export_directory.mkdir(parents=True, exist_ok=True)
+    video_track = export_directory / f"{scene_name}_video.mp4"
+    audio_track = export_directory / f"{scene_name}_audio.wav"
+    subtitle_track = export_directory / f"{scene_name}.srt"
+    merged_video = export_directory / f"{scene_name}_merged.mp4"
+
+    run_ffmpeg(
+        [
+            "-i",
+            str(native_video),
+            "-map",
+            "0:v:0",
+            "-c:v",
+            "copy",
+            "-an",
+            str(video_track),
+        ],
+        root,
+    )
+    outputs = [video_track]
+
+    native_subtitles = native_directory / f"{scene_name}.srt"
+    if native_subtitles.is_file():
+        shutil.copy2(native_subtitles, subtitle_track)
+        outputs.append(subtitle_track)
+
+    if voiceover_enabled:
+        run_ffmpeg(
+            [
+                "-i",
+                str(native_video),
+                "-map",
+                "0:a:0",
+                "-vn",
+                "-c:a",
+                "pcm_s16le",
+                str(audio_track),
+            ],
+            root,
+        )
+        outputs.append(audio_track)
+
+        if merge:
+            run_ffmpeg(
+                [
+                    "-i",
+                    str(video_track),
+                    "-i",
+                    str(audio_track),
+                    "-map",
+                    "0:v:0",
+                    "-map",
+                    "1:a:0",
+                    "-c:v",
+                    "copy",
+                    "-c:a",
+                    "aac",
+                    "-b:a",
+                    "192k",
+                    "-ar",
+                    "48000",
+                    "-ac",
+                    "2",
+                    "-shortest",
+                    "-movflags",
+                    "+faststart",
+                    str(merged_video),
+                ],
+                root,
+            )
+            if not media_has_stream(merged_video, "a:0", root):
+                raise RuntimeError(
+                    f"Merged video was created without an audio stream: {merged_video}"
+                )
+            outputs.append(merged_video)
+    elif merge:
+        shutil.copy2(video_track, merged_video)
+        outputs.append(merged_video)
+
+    return outputs
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="render",
-        description=("Render every Manim Scene declared by a numbered video project."),
+        description="Render a numbered Manim project and export its media tracks.",
     )
     parser.add_argument(
         "project",
+        nargs="?",
         help="A numeric prefix such as 034, or a full folder name.",
     )
-    parser.add_argument(
+
+    quality_group = parser.add_mutually_exclusive_group()
+    quality_group.add_argument(
         "--quality",
-        choices=QUALITY_FLAGS,
-        default="low",
-        help="Render quality (default: low).",
+        choices=QUALITY_PRESETS,
+        help="Named quality preset (default: low).",
+    )
+    quality_group.add_argument(
+        "--480p15", dest="preset", action="store_const", const="480p15"
+    )
+    quality_group.add_argument(
+        "--720p30", dest="preset", action="store_const", const="720p30"
+    )
+    quality_group.add_argument(
+        "--1080p60",
+        "--108060p",
+        dest="preset",
+        action="store_const",
+        const="1080p60",
+    )
+    quality_group.add_argument(
+        "--2160p60",
+        "--4k60",
+        dest="preset",
+        action="store_const",
+        const="2160p60",
+    )
+
+    parser.add_argument(
+        "--merge",
+        action="store_true",
+        help="Create a final MP4 by merging the exported video and audio tracks.",
     )
     parser.add_argument(
         "--preview",
         action="store_true",
-        help="Open the rendered video after Manim finishes.",
+        help="Open Manim's rendered video after rendering.",
+    )
+    parser.add_argument(
+        "--list-voices",
+        action="store_true",
+        help="List voices available from Edge TTS and exit.",
+    )
+    parser.add_argument(
+        "--voice-service",
+        choices=VOICE_SERVICES,
+        help="Override the project's configured speech service for this render.",
+    )
+    parser.add_argument(
+        "--voice",
+        help="Override the configured voice or voice ID for this render.",
     )
     return parser
 
 
 def main() -> int:
-    args = build_parser().parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
     root = repository_root()
+
+    if args.list_voices:
+        return list_edge_voices(root)
+    if not args.project:
+        parser.error("project is required unless --list-voices is used")
 
     try:
         project_dir = resolve_project(args.project, root / "videos")
@@ -141,24 +354,62 @@ def main() -> int:
         print(f"render: error: {error}")
         return 1
 
-    command = [
-        sys.executable,
-        "-m",
-        "manim",
-        QUALITY_FLAGS[args.quality],
-    ]
+    preset = selected_preset(args)
+    quality_flag, _ = PRESETS[preset]
+    command = [sys.executable, "-m", "manim", quality_flag]
     if args.preview:
         command.append("--preview")
     if voiceover_enabled:
         command.append("--disable_caching")
     command.extend([str(scene_file), *scene_names])
 
+    environment = os.environ.copy()
+    if args.voice_service:
+        environment["MANIMA_VOICE_SERVICE"] = args.voice_service
+    if args.voice:
+        environment["MANIMA_VOICE"] = args.voice
+
     print(f"Project: {project_dir.name}")
     print(f"Scenes: {', '.join(scene_names)}")
+    print(f"Resolution: {preset}")
     if voiceover_enabled:
         print("Voiceover: detected (Manim caching disabled)")
-    print(f"Output: {root / 'media'}")
-    return subprocess.run(command, cwd=root, check=False).returncode
+    result = subprocess.run(
+        command,
+        cwd=root,
+        env=environment,
+        check=False,
+    )
+    if result.returncode:
+        return result.returncode
+
+    try:
+        outputs: list[Path] = []
+        for scene_name in scene_names:
+            outputs.extend(
+                export_scene_assets(
+                    root,
+                    project_dir,
+                    scene_file,
+                    scene_name,
+                    preset,
+                    args.merge,
+                    voiceover_enabled,
+                )
+            )
+    except (
+        FileNotFoundError,
+        OSError,
+        RuntimeError,
+        subprocess.CalledProcessError,
+    ) as error:
+        print(f"render: export error: {error}")
+        return 1
+
+    print("Exported:")
+    for output in outputs:
+        print(f"  {output}")
+    return 0
 
 
 if __name__ == "__main__":

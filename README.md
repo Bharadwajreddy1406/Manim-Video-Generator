@@ -35,16 +35,37 @@ Run these commands from the repository root on Windows.
 .\render 002_system_design_01
 ```
 
-`render` defaults to Manim's low-quality development preset and writes to the
-repository's `media/` directory. It renders every Manim `Scene` declared in the
-selected project's `scene.py`. Select another quality when needed:
+`render` defaults to 480p at 15 fps and renders every Manim `Scene` declared in
+the selected project's `scene.py`. Select a resolution and frame-rate preset
+directly:
 
 ```powershell
-.\render 002 --quality medium
-.\render 002 --quality high
-.\render 002 --quality 4k
+.\render 002 --480p15
+.\render 002 --720p30
+.\render 002 --1080p60
+.\render 002 --2160p60
 .\render 002 --preview
 ```
+
+`--108060p` is accepted as an alias for `--1080p60`, and `--4k60` is accepted
+as an alias for `--2160p60`. The older `--quality low|medium|high|4k` form also
+remains supported.
+
+After rendering, separate delivery assets are written to
+`media/exports/<project>/<preset>/`:
+
+- `<Scene>_video.mp4`: silent video track;
+- `<Scene>_audio.wav`: combined narration track for voiceover scenes;
+- `<Scene>.srt`: generated subtitles, when available.
+
+Add `--merge` to remux the separate video and audio tracks into a final MP4:
+
+```powershell
+.\render 001 --1080p60 --merge
+# -> media/exports/001_derivative_intuition/1080p60/
+```
+
+Manim's native output under `media/videos/` is preserved as well.
 
 The same utilities can be invoked directly with
 `uv run python scripts/create.py` and `uv run python scripts/render.py`.
@@ -70,3 +91,66 @@ The key repository rules are:
   automatically.
 - Re-render and review the complete video with audio whenever the speech service
   or narration changes.
+
+### Choosing an Edge TTS voice
+
+List all voices currently offered by Edge TTS:
+
+```powershell
+.\render --list-voices
+```
+
+Choose one for a single render:
+
+```powershell
+.\render 001 --voice en-IN-NeerjaNeural
+```
+
+Or save the default in the project's `voiceover.json`:
+
+```json
+{
+  "service": "edge-tts",
+  "voice": "en-IN-NeerjaNeural",
+  "options": {
+    "rate": "+0%",
+    "volume": "+0%",
+    "pitch": "+0Hz"
+  }
+}
+```
+
+`edge-tts` with `en-IN-NeerjaNeural` is the repository default. Edge TTS is an
+online service and sends narration text to Microsoft's speech service. Windows
+SAPI voices are not used by this repository.
+
+### External voice providers
+
+Supported provider names are `edge-tts`, `gtts`, `azure`, `elevenlabs`, and `openai`.
+External providers must be explicitly selected and will transmit narration text
+to that provider. Install the matching optional dependency first, for example:
+
+```powershell
+uv add "manim-voiceover[openai]"
+```
+
+Then configure `voiceover.json`:
+
+```json
+{
+  "service": "openai",
+  "voice": "alloy",
+  "options": {
+    "model": "tts-1-hd"
+  }
+}
+```
+
+Configuration can be overridden for one render:
+
+```powershell
+.\render 001 --voice-service openai --voice alloy --1080p60 --merge
+```
+
+Provider-specific settings belong in `options`. API keys must remain in
+environment variables or `.env`, never in `voiceover.json` or `scene.py`.
