@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "manim": {
+      "source": "awesome-skills/manim-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "915f7f5a35ee4a13160ae1fbafa8e58d2adf956ca8d6d6647b8ff931714e3e75"
+    },
+    "manim-video": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/manim-video/SKILL.md",
+      "computedHash": "e9dc71f3a899e54362b18688e097140f00d749db8046852c8bdc3ff1a73699b4"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Local render outputs
+media/
+
+# Local temporary preview exports
+assets/quicksort-preview.gif

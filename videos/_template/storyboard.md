@@ -1,0 +1,1 @@
+ what appears visually at each moment
